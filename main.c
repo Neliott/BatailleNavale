@@ -2,7 +2,7 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.0.3 - Water Version (Affichage du menu d'aide avancé)
+ * Version : 1.0.4 - Water Version (Affichage du menu d'aide avancé)
  * Date : 05.03.2020
 */
 
@@ -14,7 +14,7 @@
 
 /*Génériques de fonctions*/
 void displayMainMenu(), setup(),displayHelp(),clear();
-int askChoiceMin();
+int askChoiceMin(int min,int max);
 
 /*CONSTANTES DE JEU*/
 const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
@@ -70,7 +70,7 @@ void displayMainMenu(){
 
     printf("Veuillez choisir une option : \n");
 
-    switch (askChoiceMin()){
+    switch (askChoiceMin(1,4)){
         case 1:
         case 3:
             printf("Cette opération n'est pas disponible pour le moment.\n");
@@ -125,15 +125,18 @@ void clear(){
 *  Permet de mieux traîter les choix que la manière native scanf seulement
 */
 
-int askChoiceMin(){
-    char choice[32] = "";
+int askChoiceMin(int min,int max){
+    /*char choice[32] = "";
     do{
         scanf("%31s", &choice);
         printf("\n");
-        if(isdigit(choice[0])){
+        if(choice[0] >= min && choice[0] <= max){
             return choice[0];
         }else{
-            printf("Veuillez taper un nombre positif seulement : \n");
+            printf("Veuillez taper un nombre de %d à %d : \n",min,max);
         }
-    }while (!isdigit(choice[0]));
+    }while (choice[0] < min || choice[0] > max);*/
+    int choice = 0;
+    scanf("%d", &choice)
+    return choice;
 }
