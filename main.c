@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.0.6 - Water Version (Création de la grille de jeu)
- * Date : 05.03.2020
+ * Version : 1.0.7 - Water Version (Création de la grille de jeu)
+ * Date : 06.03.2020
 */
 
 #include <stdio.h>
@@ -16,14 +16,17 @@
 #include "ctype.h"
 
 /*Génériques de fonctions*/
-void displayMainMenu(), setup(),displayHelp(),clear(),showGameGrild();
-int askChoiceMin(int min,int max);
+void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),displayGame();
+int askChoiceMin(int min,int max),askChoiceChar();
 
 /*CONSTANTES DE JEU*/
 const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+const int nbBoats = 5;
 const int linesMax = 10;
 const int colsMax = 10;
 
+const char gameConversion[10]={'a','b','c','d','e','f','h','i','j','k'};
+const char gameConversionMaj[10]={'A','B','C','D','E','F','H','I','J','K'};
 const char gameGrildCoule[] = {"O"};
 const char gameGrildTouche[] = {"X"};
 const char gameGrildVertical[] = {"|"};
@@ -34,10 +37,9 @@ const char gameGrildCoinHautDroite[] = {"■"};
 const char gameGrildCoinBasGauche[] = {"└"};
 const char gameGrildCoinBasDroite[]  = {"┘"};
 
+int gameGrildCoups = 0;
 int gameGrild[10][10] =
 {
-        {0,1,0,0,0,0,0,0,0,0},
-        {0,0,0,2,2,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
@@ -45,7 +47,23 @@ int gameGrild[10][10] =
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,1,0}
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0}
+};
+int gameGrildBoatsLenght[5] = {3,4,2,3,5};
+int gameGrildBoats[10][10] =
+{
+        {0,1,1,1,0,0,0,0,0,0},
+        {0,0,0,0,2,0,3,3,0,0},
+        {0,0,0,0,2,0,0,0,0,0},
+        {0,0,0,0,2,0,0,0,0,0},
+        {0,0,0,0,2,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,5},
+        {0,0,0,0,0,0,0,0,0,5},
+        {0,0,0,0,0,0,0,0,0,5},
+        {0,0,0,0,0,0,0,0,0,5},
+        {0,0,4,4,4,0,0,0,0,5}
 };
 
 /**
@@ -74,6 +92,15 @@ void setup(){
     clear();
 }
 
+void setupGame(){
+    gameGrildCoups = 0;
+    for(int lines=0;lines<linesMax;lines++){
+        for(int cols=0;cols<colsMax;cols++){
+            gameGrild[lines][cols] = 0;
+        }
+    }
+    displayGame();
+}
 /**
  * Description : Affichage du menu ainsi que le traîtement du choix
  */
@@ -92,7 +119,7 @@ void displayMainMenu(){
 
     switch (askChoiceMin(1,4)){
         case 1:
-            showGameGrild();
+            setupGame();
             break;
         case 3:
             printf("Cette opération n'est pas disponible pour le moment.\n");
@@ -130,6 +157,17 @@ void displayHelp(){
     clear();
     displayMainMenu();
 }
+void displayGame(){
+    int lineAttack = -1;
+    int colAttack = -1;
+    clear();
+    showGameGrild();
+    printf("Entrez la ligne à attaquer :");
+    lineAttack = askChoiceMin(1,10);
+    printf("\nEntrez la colone à attaquer :");
+    colAttack = askChoiceChar();
+    printf("\n");
+}
 /**
  * Affiche la grille de la bataille navale
  */
@@ -137,8 +175,15 @@ void showGameGrild(){
     clear();
 
     /*Première ligne*/
-    printf("%s",gameGrildCoinHautGauche);//Affichage cu Coin gauche
+    printf("   ");
+    for(int i = 0;i < (colsMax);i++){
+        printf("  %c ",gameConversionMaj[i]); //Affichage de traîts
+    }
 
+    printf("\n");
+
+    printf("   ");
+    printf("%s",gameGrildCoinHautGauche);//Affichage cu Coin gauche
     for(int i = 0;i < (colsMax*3)+(colsMax-1);i++){
         printf("%s",gameGrildHorizontal); //Affichage de traîts
     }
@@ -149,7 +194,7 @@ void showGameGrild(){
     /*Autres lignes*/
     for(int line = 0;line < linesMax*2; line++){ //Se répéte à chaque ligne (A double pour une ligne/2 d'affichage)
         if((line%2)!=0){ //Affichage de lignes décoratives une ligne sur deux
-
+            printf("   ");
             if(line+1 == linesMax*2){ //Affichage spécial pour la dernière ligne
 
                 printf("%s",gameGrildCoinBasGauche);//Affichage du coin gauche
@@ -171,7 +216,7 @@ void showGameGrild(){
             }
 
         }else{
-
+            printf("%2d ",(line/2)+1);
             for (int col = 0; col < colsMax; col++) {//Se répéte le nombre de colones qu'il y a dans les données
                 int celluleActuelle = gameGrild[line / 2][col];
                 switch (celluleActuelle){ //Détermine de quelle façcon la cellule va être affichée
@@ -214,19 +259,42 @@ void clear(){
 int askChoiceMin(int min,int max){
     int choice = min-1;//Si le scanf échoue, cette variable gardera cet état
 
-    do{
-        scanf("%d", &choice);
+    scanf("%d", &choice);
 
-        int voider;
-        while((voider=getchar()) != EOF && voider != '\n');
+    int voider;
+    while((voider=getchar()) != EOF && voider != '\n');
 
-        printf("\n");
-        if(choice >= min && choice <= max){
-            return choice;
-        }else{
-            printf("Veuillez taper un nombre de %d à %d : \n",min,max);
-        }
-    }while (choice < min || choice > max);
-
+    if(!(choice >= min && choice <= max)){
+        printf("\nVeuillez taper un nombre de %d à %d : ",min,max);
+        askChoiceMin();
+    }
+    printf("\n");
     return choice;
+}
+/**
+ * Idel que askChoiceMin mais avec les caractères converti en décimal à l'aide d'une grille
+ * @return
+ */
+int askChoiceChar(){
+    int isCharFounded = 0;
+    char choice = 0;
+    int charConverted = 0;
+
+    scanf("%c", &choice);
+
+    int voider;
+    while((voider=getchar()) != EOF && voider != '\n');
+
+    for(int i= 0;i<colsMax;i++){
+        if(gameConversion[i] == choice || gameConversionMaj[i] == choice){
+            isCharFounded = 1;
+            charConverted = i+1;
+        }
+    }
+    printf("\n");
+    if(!isCharFounded){
+        printf("CECI N'EST PAS UNE OPTION DISPONIBLE ! \n");
+        charConverted = askChoiceChar();
+    }
+    return charConverted;
 }
