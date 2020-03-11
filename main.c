@@ -105,13 +105,14 @@ void displayMainMenu(){
     printf("(1) - Jouer \n");
     printf("(2) - Aide \n");
     printf("(3) - Scores - Non disponible\n");
-    printf("(4) - Quitter \n");
+    printf("(4) - Où nous trouver \n");
+    printf("(5) - Quitter \n");
     printf(" \n");
 
     printf("Veuillez choisir une option : \n");
 
     /*Traîtement du choix*/
-    switch (askChoiceMin(1,4)){
+    switch (askChoiceMin(1,5)){
         case 1:
             setupGame();
             break;
@@ -120,9 +121,13 @@ void displayMainMenu(){
             displayMainMenu();
             break;
         case 4:
-            printf("Fermeture...\n");
+            system("explorer https://www.eliott.pro/liens.php");
+            printf("Naviguateur non-trouvé");
+            displayMainMenu();
             break;
-        case 2:
+        case 5:
+            printf("Fermeture...\n");
+            break;        case 2:
             displayHelp();
             break;
         default:
