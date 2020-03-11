@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.1.0 - Bark NOCOLORED Version (Première version du déroulement d'une partie)
- * Date : 06.03.2020
+ * Version : 1.1.0 - Super Bark NOCOLORED Version (Finalisation de la 0.1)
+ * Date : 11.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -12,7 +12,7 @@
 /*#include <windowsx.h> //Système de console étendu
 #include "time.h" //Gérer le temps
 #include "math.h" //Gérer des maths avancés
-#include "ctype.h"*/
+ */
 
 
 /*Génériques de fonctions*/
