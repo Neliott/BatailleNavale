@@ -7,7 +7,9 @@
 */
 
 #include <stdio.h> //Par défaut
+#include <stdlib.h>
 #include "windows.h" //Gérer les commandes console
+#include "string.h"
 
 /*#include <windowsx.h> //Système de console étendu
 #include "time.h" //Gérer le temps
@@ -16,11 +18,11 @@
 
 
 /*Génériques de fonctions*/
-void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),displayGame(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),showScores(),drawer(int type,int espace);
+void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),showScores(),drawer(int type,int espace);
 int askChoiceMin(int min,int max),askChoiceChar();
 
 /*CONSTANTES DE JEU*/
-const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 const int linesMax = 10; //Détermination de l'aire de jeu
 const int colsMax = 10; //Détermination de l'aire de jeu
 
@@ -66,7 +68,8 @@ int gameGrildBoats[10][10] = /*LA PARTIE EST POUR l'INSTANT MARQUEE DANS LE CODE
  */
 int main() {
     setup();
-    displayMainMenu();
+    displayScores();
+    //displayMainMenu();
     return 0;
 }
 
@@ -104,7 +107,7 @@ void displayMainMenu(){
     printf("Bienvenue sur le jeu 'Bataille Navale' !\n");
     printf("(1) - Jouer \n");
     printf("(2) - Aide \n");
-    printf("(3) - Scores - Non disponible\n");
+    printf("(3) - Scores\n");
     printf("(4) - Où nous trouver \n");
     printf("(5) - Quitter \n");
     printf(" \n");
@@ -116,9 +119,11 @@ void displayMainMenu(){
         case 1:
             setupGame();
             break;
+        case 2:
+            displayHelp();
+            break;
         case 3:
-            printf("Cette opération n'est pas disponible pour le moment.\n");
-            displayMainMenu();
+            displayScores();
             break;
         case 4:
             system("explorer https://www.eliott.pro/liens.php");
@@ -127,8 +132,6 @@ void displayMainMenu(){
             break;
         case 5:
             printf("Fermeture...\n");
-            break;        case 2:
-            displayHelp();
             break;
         default:
             printf("Ceci n'est pas une option valide !\n");
@@ -163,6 +166,96 @@ void displayHelp(){
     system("pause");
     clear();
     displayMainMenu();
+}
+
+void displayScores(){//WIK
+    printf("Scores :  \n");
+    FILE* fichier = NULL;
+
+    fichier = fopen("./gameassets/scores.bn", "r+");
+
+    if (fichier != NULL)
+    {
+        //fscanf(fichier, "%d", &choixTemp);
+        int positionPseu[10][6];
+        int counter = 0;
+        int line = 0;
+        char prevChar;
+        char actualChar;
+        int pvCounter = 0;
+
+        do {
+            counter++;
+            prevChar = actualChar;
+            fseek(fichier, counter, SEEK_SET);
+            actualChar = (char)fgetc(fichier);
+            printf("%d : %c %c \n",counter,actualChar,prevChar);
+            /*if(actualChar == ';'){
+                pvCounter++;
+                if(pvCounter%4 == 0){
+                    positionPseu[line][5] = counter-1;
+                    line++;
+                }
+                if(pvCounter%4 == 1){
+                    printf("1\n");
+                    positionPseu[line][0] = counter-1;
+                }
+                if(pvCounter%4 == 2){
+                    printf("2\n");
+                    positionPseu[line][1] = counter-1;
+                    positionPseu[line][2] = counter+1;
+                }
+                if(pvCounter%4 == 3){
+                    printf("3\n");
+                    positionPseu[line][3] = counter-1;
+                    positionPseu[line][4] = counter+1;
+                }
+            }*/
+        } while(actualChar != prevChar);
+
+        for(int i1= 0;i1 < 10;i1++){
+            for(int i2= 0;i2 < 6;i2++){
+                printf("%d",positionPseu[i1][i2]);
+            }
+        }
+        /*char carr;
+        do {
+            carr = (char) fgetc(fichier);
+            if (carr == ';') {
+                printf("; Actuellement : %d Pseudo : %s \n", inc, pseudo[0]);
+                if (inc == 1) {
+                    couts = atoi(coutsNoConversion);
+                }
+                inc++;
+                if (inc == 3) {
+                    printf("Pseudo : %s Couts %d Date : %s \n", pseudo[0], couts, date);
+                    inc = 0;
+                    pseudo = "RIEN";
+                    coutsNoConversion = "RIEN";
+                    date = "RIEN";
+                }
+            } else {
+                if (inc == 0) {
+                    printf("COUTS 0\n");
+                    strncat(pseudo[0], &carr, 1);
+                }
+                if (inc == 1) {
+                    printf("COUTS 1\n");
+                    char*ccc = "";
+                    strncat(ccc, &carr, 1);
+                }
+                if (inc == 2) {
+                    //strncat(date, &carr, 1);
+                }
+            }
+
+        } while(carr != EOF);
+        printf("%s",pseudo);*/
+        fclose(fichier);
+
+    }else{
+        printf("NOT FOUND");
+    }
 }
 
 /**
@@ -301,9 +394,8 @@ void endGame(){
     system("pause");
 
     clear();
-    setScore(); //1. Fonctions non-disponibles
-    showScores(); //2.
-    displayMainMenu();
+    setScore(); //Fonction non-disponible
+    displayScores();
 }
 
 /**
@@ -445,8 +537,5 @@ int askChoiceChar(){
 
 /*---- FONCTIONS DE LA VERSION 1 - NON-FONCTIONNEL ----*/
 void setScore(){
-
-}
-void showScores(){
 
 }
