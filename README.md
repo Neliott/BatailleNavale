@@ -1,6 +1,7 @@
 # Jeu "Bataille Navale"
 **Description**
 Une projet d'entrainement en C afin de s’entraîner à exécuter des mandats, gérer ses projets ainsi que les documenter. 
+
 **Comment le tester (Windows)**
 
  1. Téléchargez le projet complet ici : https://github.com/EliottJaquierCPNV/BatailleNavale/archive/master.zip
