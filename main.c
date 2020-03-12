@@ -171,88 +171,65 @@ void displayHelp(){
 void displayScores(){//WIK
     printf("Scores :  \n");
     FILE* fichier = NULL;
-
     fichier = fopen("./gameassets/scores.bn", "r+");
 
-    if (fichier != NULL)
-    {
-        //fscanf(fichier, "%d", &choixTemp);
-        int positionPseu[10][6];
-        int counter = 0;
-        int line = 0;
-        char prevChar;
-        char actualChar;
-        int pvCounter = 0;
+    int nbLines = 0;
+    char lines[100][128];
 
-        do {
-            counter++;
-            prevChar = actualChar;
-            fseek(fichier, counter, SEEK_SET);
-            actualChar = (char)fgetc(fichier);
-            printf("%d : %c %c \n",counter,actualChar,prevChar);
-            /*if(actualChar == ';'){
-                pvCounter++;
-                if(pvCounter%4 == 0){
-                    positionPseu[line][5] = counter-1;
-                    line++;
-                }
-                if(pvCounter%4 == 1){
-                    printf("1\n");
-                    positionPseu[line][0] = counter-1;
-                }
-                if(pvCounter%4 == 2){
-                    printf("2\n");
-                    positionPseu[line][1] = counter-1;
-                    positionPseu[line][2] = counter+1;
-                }
-                if(pvCounter%4 == 3){
-                    printf("3\n");
-                    positionPseu[line][3] = counter-1;
-                    positionPseu[line][4] = counter+1;
-                }
-            }*/
-        } while(actualChar != prevChar);
+    char names[100][64];
+    char date[100][10];
+    char pointS[100][10];
+    int points[100];
 
-        for(int i1= 0;i1 < 10;i1++){
-            for(int i2= 0;i2 < 6;i2++){
-                printf("%d",positionPseu[i1][i2]);
+    //atoi();
+    if(fichier!= NULL){
+        for(int i = 0;i<100;i++){
+            points[i] = 0;
+            for(int leng = 0;leng<64;leng++){
+                names[i][leng] = ' ';
+            }
+            for(int leng = 0;leng<10;leng++){
+                date[i][leng] = ' ';
+                pointS[i][leng] = ' ';
             }
         }
-        /*char carr;
-        do {
-            carr = (char) fgetc(fichier);
-            if (carr == ';') {
-                printf("; Actuellement : %d Pseudo : %s \n", inc, pseudo[0]);
-                if (inc == 1) {
-                    couts = atoi(coutsNoConversion);
-                }
-                inc++;
-                if (inc == 3) {
-                    printf("Pseudo : %s Couts %d Date : %s \n", pseudo[0], couts, date);
-                    inc = 0;
-                    pseudo = "RIEN";
-                    coutsNoConversion = "RIEN";
-                    date = "RIEN";
-                }
-            } else {
-                if (inc == 0) {
-                    printf("COUTS 0\n");
-                    strncat(pseudo[0], &carr, 1);
-                }
-                if (inc == 1) {
-                    printf("COUTS 1\n");
-                    char*ccc = "";
-                    strncat(ccc, &carr, 1);
-                }
-                if (inc == 2) {
-                    //strncat(date, &carr, 1);
+
+        while(fgets(lines[nbLines], 128, fichier))
+        {
+            lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
+            nbLines++;
+        }
+
+        for(int i = 0; i < nbLines; ++i)
+        {
+            int nbPointVirgule =0;
+            for(int caracteres;caracteres < 128;caracteres++){
+                if(lines[i][caracteres] == ';'){
+                    nbPointVirgule++;
+                    if(nbPointVirgule == 4){
+                        nbPointVirgule = 0;
+                    }
+                }else{
+                    switch (nbPointVirgule){
+                        case 1:
+                            strcat(&names[i], lines[i][caracteres]);
+                            break;
+                        case 2:
+                            strcat(&pointS[i], lines[i][caracteres]);
+                            break;
+                        case 3:
+                            strcat(&date[i], lines[i][caracteres]);
+                            break;
+                    }
                 }
             }
+        }
 
-        } while(carr != EOF);
-        printf("%s",pseudo);*/
+        /*for(int i = 0;i<100;i++){
+            printf("%s",names[i]);
+        }*/
+
         fclose(fichier);
-
     }else{
         printf("NOT FOUND");
     }
