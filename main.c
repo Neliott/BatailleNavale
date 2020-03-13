@@ -50,18 +50,18 @@ const int gameGrildBoatsNb = 5; //Nombres de bateaux
 int gameGrildBoatsHit[5] = {0,0,0,0,0}; //Nombre de zones touchées par le joueur pour chaque bateaux
 int gameGrildBoatsLenght[5] = {5,4,3,3,2};//Nombre de zones maximales par bateaux (Calculé pendant l'initialisation de la partie)
 int gameGrildBoats[GrildLenght][GrildLenght] = /*LA PARTIE EST POUR l'INSTANT MARQUEE DANS LE CODE*/
-        {
-                {0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0},
-                {0,0,0,0,0,0,0,0,0,0},
-                {0,0,5,5,0,0,0,0,0,0},
-                {0,3,3,3,0,0,0,0,0,1},
-                {0,4,4,4,0,0,0,0,0,1},
-                {0,0,0,0,0,0,0,0,0,1},
-                {0,0,0,0,0,0,0,0,0,1},
-                {0,0,2,2,2,2,0,0,0,1}
-        };
+{
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,5,5,0,0,0,0,0,0},
+        {0,3,3,3,0,0,0,0,0,1},
+        {0,4,4,4,0,0,0,0,0,1},
+        {0,0,0,0,0,0,0,0,0,1},
+        {0,0,0,0,0,0,0,0,0,1},
+        {0,0,2,2,2,2,0,0,0,1}
+};
 
 /**
  * Description : Le lancement et la fermeture du programme est ici
@@ -69,6 +69,7 @@ int gameGrildBoats[GrildLenght][GrildLenght] = /*LA PARTIE EST POUR l'INSTANT MA
  */
 int main() {
     setup();
+    //setScore();
     displayMainMenu();
     return 0;
 }
