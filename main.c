@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.1.0 - Super Bark NOCOLORED Version (Finalisation de la 0.1)
- * Date : 11.03.2020
+ * Version : 1.1.1 - Super Bark NOCOLORED Version (Finalisation de la 0.1)
+ * Date : 16.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -11,13 +11,15 @@
 #include "windows.h" //Gérer les commandes console
 #include "string.h" //Ajoute quelques fonctions utiles pour les tableaux de char
 #include <time.h> //Le système servant pour la date
+#include <dirent.h>
+#include <time.h>
 
 /*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
-#define MaxScoresDispalyed 100
-#define GrildLenght 10
+#define MaxScoresDispalyed 100 //Le nombre maximum de scores affichés
+#define GrildLenght 10 //La longueur de la grille de jeu (carrée)
 
 /*Génériques de fonctions*/
-void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace);
+void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace);
 int askChoiceMin(int min,int max),askChoiceChar();
 
 int split (const char *str, char c, char ***arr); // ! FONCTION DE : http://source-code-share.blogspot.com/2014/07/implementation-of-java-stringsplit.html
@@ -49,19 +51,19 @@ int gameGrild[GrildLenght][GrildLenght]; //Grille affichée à l'écran
 const int gameGrildBoatsNb = 5; //Nombres de bateaux
 int gameGrildBoatsHit[5] = {0,0,0,0,0}; //Nombre de zones touchées par le joueur pour chaque bateaux
 int gameGrildBoatsLenght[5] = {5,4,3,3,2};//Nombre de zones maximales par bateaux (Calculé pendant l'initialisation de la partie)
-int gameGrildBoats[GrildLenght][GrildLenght] = /*LA PARTIE EST POUR l'INSTANT MARQUEE DANS LE CODE*/
-{
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,5,5,0,0,0,0,0,0},
-        {0,3,3,3,0,0,0,0,0,1},
-        {0,4,4,4,0,0,0,0,0,1},
-        {0,0,0,0,0,0,0,0,0,1},
-        {0,0,0,0,0,0,0,0,0,1},
-        {0,0,2,2,2,2,0,0,0,1}
-};
+int gameGrildBoats[GrildLenght][GrildLenght] =
+    {
+            {0,0,0,0,0,0,0,0,0,0},
+            {0,0,0,0,0,0,0,0,0,0},
+            {0,0,0,0,0,0,0,0,0,0},
+            {0,0,0,0,0,0,0,0,0,0},
+            {0,0,5,5,0,0,0,0,0,0},
+            {0,3,3,3,0,0,0,0,0,1},
+            {0,4,4,4,0,0,0,0,0,1},
+            {0,0,0,0,0,0,0,0,0,1},
+            {0,0,0,0,0,0,0,0,0,1},
+            {0,0,2,2,2,2,0,0,0,1}
+    };//La carte du niveau entier est ici (0 - eau, de 1 à 5 - un id de bateau)
 
 /**
  * Description : Le lancement et la fermeture du programme est ici
@@ -210,7 +212,7 @@ void setScore(){
         /*Vidage de tous les caractères précédemment stocké dans la mémoire*/
         for(int i = 0;i<MaxScoresDispalyed;i++){
             for(int leng = 0;leng<128;leng++){
-                lines[i][leng] = 'NULL';
+                lines[i][leng] = NULL;
             }
         }
         /*Récupération du nombre de lignes du fichier et séparation des lignes dans un tableau à 2 dimenstions*/
@@ -330,6 +332,7 @@ void displayScores(){
  */
 void setupGame(){
     gameGrildCoups = 0;//Le joueur n'a pas encore joué de coups
+    //getRandomGame(); //Prends une carte au hasard d'un sous-dossier
 
     /*Remise à 0 de la grille du joueur*/
     for(int lines=0;lines<linesMax;lines++){
@@ -354,6 +357,121 @@ void setupGame(){
         }
     }
     displayGame();
+}
+/**
+ * Descriptino : WIP (Récupère une partie existante à partir d'un fichier
+ */
+void getRandomGame(){
+    clear();
+    /*Séléction du choix par l'utilisateur*/
+    printf("Comment souhaitez-vous jouer ?\n");
+    printf("1. Choisir la carte de mon choix dans le dossier 'maps'\n");
+    printf("2. Prendre une carte aléatoire du dossier 'maps'\n");
+    printf("3. Générer une carte aléatoire (non-disponible actuellement)\n");
+
+    int choix = askChoiceMin(1,2);
+
+    char pathFile[128] = "./maps/"; //Le chemin d'acces à la carte
+
+    /*Séléction du niveau*/
+    if(choix > 0 && choix < 3){
+        pathFile[128] = "./maps/";
+        DIR* rep = opendir("maps"); //https://waytolearnx.com/2019/09/lister-les-fichiers-dans-un-repertoire-en-c.html
+
+        if ( rep != NULL )//Si le répertoire existe
+        {
+            struct dirent* ent;//Création d'une structure d'un fichier
+            int nbFiles = 0;
+            char filesFounded[100][64];
+
+            while ( (ent = readdir(rep) ) != NULL )//Tourne tant qu'il reste des fichier qui n'ont pas été pris
+            {
+                if( ent->d_name[0] != '.'){//Si ce n'est pas un chemin d'accès pour revenir en arrière (ex : "..")
+                    for(int i = 0;i < strlen(ent->d_name);i++){
+                        filesFounded[nbFiles][i] = ent->d_name[i];
+                    }
+                    nbFiles++;
+                }
+            }
+            closedir(rep);
+            if(nbFiles == 0){//Si il n'y a pas de fichiers trouvés
+                printf("Oops ! Aucune carte n'a été trouvé dans le dossier 'maps'.\n");
+                printf("Veuillez mettre une carte en .bnmap dedans pour continuer...\n");
+                system("pause");
+                getRandomGame();
+            }else{
+                if(choix == 1){
+                    printf("Veuillez entrer le nom de la carte :\n");
+                    char file[64];
+                    scanf("%63s", file);
+                    /*Vidage du scanf si un problème précédant est survenu ou un dépassement*/
+                    int voider; //La variable la plus temporaire que je n'ai jamais vue.
+                    while((voider=getchar()) != EOF && voider != '\n'); //Li un caractère jusqu'à ce que le "scanf" ne lui envoye plus rien d'interresant
+
+                    int founded = 0;
+                    for(int i = 0; i< nbFiles;i++){
+                        if(founded == 0){
+                            if(strcmp(file,filesFounded[i]) == 0){
+                                founded = 1;
+                                strcat(pathFile, filesFounded[i]);
+                            } else {
+                                printf("Carte non-trouvée !\n");
+                                system("pause");
+                                getRandomGame();
+                            }
+                        }
+                    }
+                }
+                if(choix == 2){
+                    srand(time(NULL));
+                    int random =  (rand() % nbFiles);
+                    strcat(pathFile, filesFounded[random]);
+                }
+            }
+        }else{
+            printf("Oops ! Le dossier 'maps' n'a pas été trouvé. Il viens donc d'être créé.'\n");
+            printf("Veuillez mettre une carte en .bnmap dedans pour continuer...\n");
+            system("pause");
+            getRandomGame();
+        }
+    }else{
+        getRandomGame();
+    }
+
+    /*Traîtement du niveau*/
+    printf("Ouverture de : %s\n",pathFile);
+
+    FILE* fichier = NULL;
+    fichier = fopen(pathFile, "r+");//Ouverture du fichier dans le mode LECTURE/ECRITURE
+
+    if(fichier!= NULL) {//Si le fichier existe
+        int nbLines = 0; //Nombres de lignes dans le fichier
+        char lines[GrildLenght+2][GrildLenght*2+2];//Le contenu du fichier ligne par ligne
+
+        /*Récupération du nombre de lignes du fichier et séparation des lignes dans un tableau à 2 dimenstions*/
+        while (fgets(lines[nbLines], strlen(lines[nbLines]), fichier)) {
+            lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
+            nbLines++;
+        }/*
+        for(int i = 0;i< nbLines;i++){
+            int nbSplits = 0; //Nombre de split (5 ici)
+            char** arr = NULL; //Les mots entiers splittés
+
+            nbSplits = split(lines[i], ',', &arr);//Séparation ligne après lignes, ';' après ';' dans un tableau à 2 dimension
+            for(int placeColone = 0;placeColone < GrildLenght;placeColone++){
+                //gameGrildBoats[i][placeColone] = atoi();
+                printf("%s",arr[placeColone]);
+            }
+        }
+        for(int ligne = 0;ligne < 10;ligne++){
+            for(int col = 0;col < 10;col++){
+                printf("%d ",gameGrildBoats[ligne][col] );
+            }
+            printf("\n");
+        }*/
+    }else{
+        printf("Fichier non-trouvé");
+    }
 }
 
 /**
