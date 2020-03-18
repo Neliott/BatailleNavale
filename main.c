@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.1.1 - Super Bark NOCOLORED Version (Finalisation de la 0.1)
- * Date : 16.03.2020
+ * Version : 1.2 - Super Bark NOCOLORED Version (Finalisation de la 0.1)
+ * Date : 18.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -13,6 +13,9 @@
 #include <time.h> //Le système servant pour la date
 #include <dirent.h>
 #include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
 #define MaxScoresDispalyed 100 //Le nombre maximum de scores affichés
@@ -21,8 +24,6 @@
 /*Génériques de fonctions*/
 void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace);
 int askChoiceMin(int min,int max),askChoiceChar();
-
-int split (const char *str, char c, char ***arr); // ! FONCTION DE : http://source-code-share.blogspot.com/2014/07/implementation-of-java-stringsplit.html
 
 /*CONSTANTES DE JEU*/
 const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
@@ -51,19 +52,7 @@ int gameGrild[GrildLenght][GrildLenght]; //Grille affichée à l'écran
 const int gameGrildBoatsNb = 5; //Nombres de bateaux
 int gameGrildBoatsHit[5] = {0,0,0,0,0}; //Nombre de zones touchées par le joueur pour chaque bateaux
 int gameGrildBoatsLenght[5] = {5,4,3,3,2};//Nombre de zones maximales par bateaux (Calculé pendant l'initialisation de la partie)
-int gameGrildBoats[GrildLenght][GrildLenght] =
-    {
-            {0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0},
-            {0,0,5,5,0,0,0,0,0,0},
-            {0,3,3,3,0,0,0,0,0,1},
-            {0,4,4,4,0,0,0,0,0,1},
-            {0,0,0,0,0,0,0,0,0,1},
-            {0,0,0,0,0,0,0,0,0,1},
-            {0,0,2,2,2,2,0,0,0,1}
-    };//La carte du niveau entier est ici (0 - eau, de 1 à 5 - un id de bateau)
+int gameGrildBoats[GrildLenght][GrildLenght];//La carte du niveau entier est ici (0 - eau, de 1 à 5 - un id de bateau)
 
 /**
  * Description : Le lancement et la fermeture du programme est ici
@@ -71,7 +60,6 @@ int gameGrildBoats[GrildLenght][GrildLenght] =
  */
 int main() {
     setup();
-    //setScore();
     displayMainMenu();
     return 0;
 }
@@ -85,8 +73,19 @@ void setup(){
         SetConsoleTitle("Bataille Navale"); //Peut provoquer des erreurs dans la version sur CLION en affichant le contenu dans la console (ceci est maintenant protégé)
         //system("color 13");//69,67,14,73
     }else{
-        printf("ATTENTION ! VERSION CLION ONLY ! NE PAS COMPILER EN DEHORS ! (Changer la constante isEditor)\n");
+        printf("ATTENTION !");
+        Sleep(500);
+        printf(" VERSION CLION - EDITEUR ONLY !");
+        Sleep(500);
+        printf(" NE PAS EXECUTER EN DEHORS DU MODE INTEGRE de CLION! ");
+        Sleep(2000);
+        printf("(Changer la constante isEditor)\n");
+        Sleep(4000);
     }
+    /*Création des dossiers requis pour commencer le jeu*/
+    mkdir("maps");
+    mkdir("gameassets");
+
     printf("\n");
     clear();
     //visualEvent(0);
@@ -187,9 +186,11 @@ void setScore(){
     }
 
     /*Récupération du pseudo*/
-    printf("Veuillez entrer un pseudo : \n");
     char pseudo[63];
+
+    printf("Veuillez entrer un pseudo : \n");
     scanf("%63s", &pseudo);
+
     /*Vidage du scanf si il y a un débordement*/
     int voider; //La variable la plus temporaire que je n'ai jamais vue.
     while((voider=getchar()) != EOF && voider != '\n'); //Li un caractère jusqu'à ce que le "scanf" ne lui envoye plus rien d'interresant
@@ -202,6 +203,9 @@ void setScore(){
     int score = gameGrildCoups; //Le système de score sera plus poussé pas la suite
 
     /*Enregistrement du score*/
+    mkdir("gameassets");//Création du dossier (Au cas ou il ne le serait plus - supprimé entre temps)
+
+    /*Ouverture du fichier*/
     FILE* fichier = NULL;
     fichier = fopen("./gameassets/scores.bn", "r+");//Ouverture du fichier dans le mode LECTURE/ECRITURE
 
@@ -212,14 +216,17 @@ void setScore(){
         /*Vidage de tous les caractères précédemment stocké dans la mémoire*/
         for(int i = 0;i<MaxScoresDispalyed;i++){
             for(int leng = 0;leng<128;leng++){
-                lines[i][leng] = NULL;
+                lines[i][leng] = ' ';
             }
         }
+
         /*Récupération du nombre de lignes du fichier et séparation des lignes dans un tableau à 2 dimenstions*/
         while(fgets(lines[nbLines], strlen(lines[nbLines]), fichier))
         {
-            lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
-            nbLines++;
+            if(nbLines < MaxScoresDispalyed-1){
+                lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
+                nbLines++;
+            }
         }
         fclose(fichier);//Fermeture du fichier
 
@@ -239,6 +246,7 @@ void setScore(){
 
         fclose(fp3);//Fermeture du fichier
     }else{
+        printf("Fichier non-trouvé ! Création.");
         fclose(fichier);
 
         /*Création d'un nouveau fichier*/
@@ -251,7 +259,7 @@ void setScore(){
 }
 
 /**
- * Description : Affichage des derniers scores
+ * Description : Affichage des derniers scores depuis un fichier externe
  */
 void displayScores(){
     clear();
@@ -264,6 +272,7 @@ void displayScores(){
     }
 
     FILE* fichier = NULL;
+    mkdir("gameassets");
     fichier = fopen("./gameassets/scores.bn", "r+");//Ouverture du fichier dans le mode LECTURE/ECRITURE
 
     if(fichier!= NULL){//Si le fichier existe
@@ -271,23 +280,12 @@ void displayScores(){
         char lines[MaxScoresDispalyed][128];//Le contenu du fichier ligne par ligne
 
         //Variables pour la séparation de la date, des points et des pseudos depuis les lignes
-        char names[MaxScoresDispalyed][64];
-        char date[MaxScoresDispalyed][32];
-        char pointS[MaxScoresDispalyed][8];
-        int points[MaxScoresDispalyed];//NON UTILISE POUR l'INSTANT (utiliser atoi();)
+        char* names[MaxScoresDispalyed];
+        char* date[MaxScoresDispalyed];
+        char* pointS[MaxScoresDispalyed];
 
         /*Vidage de tous les caractères précédemment stocké dans la mémoire*/
         for(int i = 0;i<MaxScoresDispalyed;i++){
-            points[i] = 0;
-            for(int leng = 0;leng<64;leng++){
-                names[i][leng] = ' ';
-            }
-            for(int leng = 0;leng<8;leng++){
-                pointS[i][leng] = ' ';
-            }
-            for(int leng = 0;leng<32;leng++){
-                date[i][leng] = ' ';
-            }
             for(int leng = 0;leng<128;leng++){
                 lines[i][leng] = ' ';
             }
@@ -296,22 +294,29 @@ void displayScores(){
         /*Récupération du nombre de lignes du fichier et séparation des lignes dans un tableau à 2 dimenstions*/
         while(fgets(lines[nbLines], strlen(lines[nbLines]), fichier))
         {
-            lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
-            nbLines++;
+            if(nbLines < MaxScoresDispalyed-1){
+                lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
+                nbLines++;
+            }
         }
 
         /*Séparation de la date, des points et des pseudos depuis les lignes*/
         for(int i = 0; i < nbLines; ++i)
         {
-            int nbSplits = 0; //Nombre de split (5 ici)
-            char** arr = NULL; //Les mots entiers splittés
+            /*  https://www.educative.io/edpresso/splitting-a-string-using-strtok-in-c  */
+            char * token = strtok(lines[i], ";"); //Division une première fois des différentes parties (dans un pointeur)
+            int countWords = 0;
 
-            nbSplits = split(lines[i], ';', &arr);//Séparation ligne après lignes, ';' après ';' dans un tableau à 2 dimension
-            //Copie des information reçues
-            strcpy(names[i],arr[1]);
-            strcpy(pointS[i],arr[2]);
-            strcpy(date[i],arr[3]);
-
+            char *strg[100];
+            while( token != NULL ) { //Boucle avec un pointeur permettant d'identifier l'emplacement de chaques mots
+                strg[countWords] = token; //Duplication du pointeur temporaire dans un petit tableau
+                token = strtok(NULL, ";"); //Division suivante des différentes parties
+                countWords++;
+            }
+            /*Ecriture (Transfert) de pointeurs dans les tableaux de pointeur officiels*/
+            names[i] = strg[0];
+            pointS[i] = strg[1];
+            date[i] = strg[2];
         }
         /*Affichage des scores*/
         printf("DATE/HEURE\t\tCOUPS\tPSEUDO\n");
@@ -321,7 +326,7 @@ void displayScores(){
         fclose(fichier);
     }else{
         printf("DATE/HEURE\tCOUPS\tPSEUDO\n");
-        printf("Aucun résulata.\n");
+        printf("Aucun résulta.\n");
     }
     system("pause");
     displayMainMenu();
@@ -332,7 +337,7 @@ void displayScores(){
  */
 void setupGame(){
     gameGrildCoups = 0;//Le joueur n'a pas encore joué de coups
-    //getRandomGame(); //Prends une carte au hasard d'un sous-dossier
+    getRandomGame(); //Prends une carte au hasard d'un sous-dossier
 
     /*Remise à 0 de la grille du joueur*/
     for(int lines=0;lines<linesMax;lines++){
@@ -359,86 +364,108 @@ void setupGame(){
     displayGame();
 }
 /**
- * Descriptino : WIP (Récupère une partie existante à partir d'un fichier
+ * Descriptino : Récupère une partie existante à partir d'un fichier ou demande à l'utilisateur de la choisir
  */
 void getRandomGame(){
-    clear();
-    /*Séléction du choix par l'utilisateur*/
-    printf("Comment souhaitez-vous jouer ?\n");
-    printf("1. Choisir la carte de mon choix dans le dossier 'maps'\n");
-    printf("2. Prendre une carte aléatoire du dossier 'maps'\n");
-    printf("3. Générer une carte aléatoire (non-disponible actuellement)\n");
-
-    int choix = askChoiceMin(1,2);
-
     char pathFile[128] = "./maps/"; //Le chemin d'acces à la carte
+    int hasValidFile = 0;
+    do {
+        clear();
+        /*Séléction du choix par l'utilisateur*/
+        printf("Comment souhaitez-vous jouer ?\n");
+        printf("1. Choisir la carte de mon choix dans le dossier 'maps'\n");
+        printf("2. Prendre une carte aléatoire du dossier 'maps'\n");
+        printf("3. Générer une carte aléatoire (non-disponible actuellement)\n");
 
-    /*Séléction du niveau*/
-    if(choix > 0 && choix < 3){
-        pathFile[128] = "./maps/";
-        DIR* rep = opendir("maps"); //https://waytolearnx.com/2019/09/lister-les-fichiers-dans-un-repertoire-en-c.html
+        int choix = askChoiceMin(1,2);
 
-        if ( rep != NULL )//Si le répertoire existe
-        {
-            struct dirent* ent;//Création d'une structure d'un fichier
-            int nbFiles = 0;
-            char filesFounded[100][64];
+        /*Séléction du type de chargment de map*/
+        if(choix > 0 && choix < 3){
+            pathFile[128] = "./maps/";
+            DIR* rep = opendir("maps"); //https://waytolearnx.com/2019/09/lister-les-fichiers-dans-un-repertoire-en-c.html
 
-            while ( (ent = readdir(rep) ) != NULL )//Tourne tant qu'il reste des fichier qui n'ont pas été pris
+            if (rep != NULL)//Si le répertoire existe
             {
-                if( ent->d_name[0] != '.'){//Si ce n'est pas un chemin d'accès pour revenir en arrière (ex : "..")
-                    for(int i = 0;i < strlen(ent->d_name);i++){
-                        filesFounded[nbFiles][i] = ent->d_name[i];
-                    }
-                    nbFiles++;
-                }
-            }
-            closedir(rep);
-            if(nbFiles == 0){//Si il n'y a pas de fichiers trouvés
-                printf("Oops ! Aucune carte n'a été trouvé dans le dossier 'maps'.\n");
-                printf("Veuillez mettre une carte en .bnmap dedans pour continuer...\n");
-                system("pause");
-                getRandomGame();
-            }else{
-                if(choix == 1){
-                    printf("Veuillez entrer le nom de la carte :\n");
-                    char file[64];
-                    scanf("%63s", file);
-                    /*Vidage du scanf si un problème précédant est survenu ou un dépassement*/
-                    int voider; //La variable la plus temporaire que je n'ai jamais vue.
-                    while((voider=getchar()) != EOF && voider != '\n'); //Li un caractère jusqu'à ce que le "scanf" ne lui envoye plus rien d'interresant
+                struct dirent *ent;//Création d'une structure d'un fichier
 
-                    int founded = 0;
-                    for(int i = 0; i< nbFiles;i++){
-                        if(founded == 0){
-                            if(strcmp(file,filesFounded[i]) == 0){
-                                founded = 1;
-                                strcat(pathFile, filesFounded[i]);
-                            } else {
-                                printf("Carte non-trouvée !\n");
-                                system("pause");
-                                getRandomGame();
+                int nbFiles = 0;//Nombre de fichiers listé dans le dossier en question
+                char filesFounded[100][64];//Nom des fichiers dans le dossier en question (ceci n'est pas le chemin d'accès car ils sont dans un sous-dossier)
+
+                /*Initialisation des fichiers trouvés avec une valeur par défaut*/
+                for (int flLine = 0; flLine < 100; flLine++) {
+                    for (int flContent = 0; flContent < 64; flContent++) {
+                        filesFounded[flLine][flContent] = NULL;
+                    }
+                }
+
+                clear();
+                /*Affichage des carte trouvées dans tout les cas*/
+                printf("----Cartes trouvées----\n\n");
+
+                while ((ent = readdir(rep)) != NULL)//Tourne tant qu'il reste des fichier qui n'ont pas été pris
+                {
+                    if (ent->d_name[0] != '.') {//Si ce n'est pas un chemin d'accès pour revenir en arrière (ex : ".." ou ".")
+                        for (int i = 0; i < strlen(ent->d_name); i++) {
+                            filesFounded[nbFiles][i] = ent->d_name[i]; //Tous les fichiers trouvés se stockent dans le tableau des fichiers trouvés
+                        }
+                        printf("%s \n", filesFounded[nbFiles]);//Liste utilile si le joueur veut pouvoir choisi plus facilement sa carte
+                        nbFiles++;
+                    }
+                }
+
+                closedir(rep);//Fermeture de la gestion du répertoire (étant donné qi'il y a déja un tablea avec tous les ficheirs dedans)
+
+                if (nbFiles == 0) {//Si il n'y a pas de fichiers trouvés
+                    printf("Oops ! Aucune carte n'a été trouvé dans le dossier 'maps'.\n");
+                    printf("Veuillez mettre une carte en .bnmap (utf-8 sans BOM vivement conseillé) dedans pour continuer...\n");
+                    system("pause");
+                    hasValidFile = 0;
+                } else {
+                    if (choix == 1) {//Si le joueur veut choisir sa carte
+                        /*Selection du joueur*/
+                        printf("\nVeuillez entrer le nom de la carte :\n");
+                        char file[64] = "";
+                        scanf("%62s", file);
+
+                        int voider; while ((voider = getchar()) != EOF && voider !='\n'); //Vidage du scanf si un problème précédant est survenu ou un dépassement//
+
+                        int founded = 0;
+                        for (int i = 0; i < nbFiles; i++) {
+                            if (founded == 0) {
+                                //printf("Dans %s ressemblance : %d \n", filesFounded[i], strcmp(file, filesFounded[i]));
+                                if (strcmp(file, filesFounded[i]) == 0) { //Comparaison du choix de l'utilisateur avec chaque fichiers (fonction déterminant quel différences il y a ua niveau des caractères) si la fonctino retourne 0, il n'y a aucune différence et donc la carte existe
+                                    founded = 1;
+                                    strcat(pathFile, filesFounded[i]); //Ajout du chemin d'accès au dossier + le fichier poru avoir un chemin d'accès complet j'usqu'au fichier
+                                    hasValidFile = 1;
+                                }
                             }
                         }
+                        if(founded == 0){//Si aucune cartte ne correspond
+                            printf("Carte non-trouvée !\n");
+                            system("pause");
+                            hasValidFile = 0;
+                        }
+                    }
+                    if (choix == 2) {//Prise d'une carte aléatoire
+                        srand(time(NULL));
+                        int random = (rand() % nbFiles);
+                        strcat(pathFile, filesFounded[random]);//Ajout du chemin d'accès au dossier + le fichier poru avoir un chemin d'accès complet j'usqu'au fichier
+                        hasValidFile = 1;
                     }
                 }
-                if(choix == 2){
-                    srand(time(NULL));
-                    int random =  (rand() % nbFiles);
-                    strcat(pathFile, filesFounded[random]);
-                }
+            } else {
+                mkdir("maps"); //Ce cas arrive seulement si le joueur supprime le dossier entre temps.
+                printf("Oops ! Le dossier 'maps' n'a pas été trouvé. Il viens donc d'être créé.'\n");
+                printf("Veuillez mettre une carte en .bnmap dedans pour continuer...\n");
+                system("pause");
+                hasValidFile = 0;
             }
-        }else{
-            printf("Oops ! Le dossier 'maps' n'a pas été trouvé. Il viens donc d'être créé.'\n");
-            printf("Veuillez mettre une carte en .bnmap dedans pour continuer...\n");
-            system("pause");
-            getRandomGame();
         }
-    }else{
-        getRandomGame();
-    }
+    }while (hasValidFile == 0);
 
-    /*Traîtement du niveau*/
+
+    /*Traîtement et importation du niveau*/
+
     printf("Ouverture de : %s\n",pathFile);
 
     FILE* fichier = NULL;
@@ -449,28 +476,21 @@ void getRandomGame(){
         char lines[GrildLenght+2][GrildLenght*2+2];//Le contenu du fichier ligne par ligne
 
         /*Récupération du nombre de lignes du fichier et séparation des lignes dans un tableau à 2 dimenstions*/
-        while (fgets(lines[nbLines], strlen(lines[nbLines]), fichier)) {
+        while (fgets(lines[nbLines],(GrildLenght*2)+2, fichier)) {
             lines[nbLines][strlen(lines[nbLines]) - 1] = '\0';
             nbLines++;
-        }/*
-        for(int i = 0;i< nbLines;i++){
-            int nbSplits = 0; //Nombre de split (5 ici)
-            char** arr = NULL; //Les mots entiers splittés
-
-            nbSplits = split(lines[i], ',', &arr);//Séparation ligne après lignes, ';' après ';' dans un tableau à 2 dimension
+        }
+        /*Recopie la structure du fichier pour la metttre dans le tableau*/
+        for(int i = 0;i< GrildLenght;i++){
             for(int placeColone = 0;placeColone < GrildLenght;placeColone++){
-                //gameGrildBoats[i][placeColone] = atoi();
-                printf("%s",arr[placeColone]);
+                char ch = lines[i][placeColone];
+                gameGrildBoats[i][placeColone] = (int) strtol(&ch, NULL, 10);
             }
         }
-        for(int ligne = 0;ligne < 10;ligne++){
-            for(int col = 0;col < 10;col++){
-                printf("%d ",gameGrildBoats[ligne][col] );
-            }
-            printf("\n");
-        }*/
     }else{
-        printf("Fichier non-trouvé");
+        printf("Oops ! Une erreur est survenue ! Le fichier précédemment trouvé n'est plus disponible. Essayez de redémarer le jeu pour régler le problème.\n");
+        system("pause");
+        exit(1);
     }
 }
 
@@ -575,7 +595,7 @@ void touchBoat(int line,int col){
 void endGame(){
     showGameGrild();
     //visualEvent(4);
-    printf("PARTIE TERMINEE EN %d COUPS !",gameGrildCoups);
+    printf("PARTIE TERMINEE EN %d COUPS ! \n",gameGrildCoups);
     system("pause");
 
     clear();
@@ -665,7 +685,7 @@ void clear(){
     if(isEditor == 0){
         system("cls");
     }else{
-        for(int i=0;i<=10;i++){
+        for(int i=0;i<=5;i++){
             printf("\n");
         }
     }
@@ -718,72 +738,4 @@ int askChoiceChar(){
         charConverted = askChoiceChar();
     }
     return charConverted;
-}
-
-/*---- OUTILS DE LA COMMUNAUTE ----*/
-
-/**
- * Description : Un splitteur automatique de string
- * Fonction reprise d'ici : http://source-code-share.blogspot.com/2014/07/implementation-of-java-stringsplit.html (Sans commentaire)
- * @param str La chaine de caractère originale
- * @param c Le caractère de split
- * @param arr Le tableau à 2 dimensions de fin
- * @return
- */
-int split (const char *str, char c, char ***arr){
-    int count = 1;  //Nombre de splits différents
-    int token_len = 1; //Grandeur d'un mot splité
-    int i = 0; //Variable d'incrémentation servant à plurieurs choses dans le programme
-    char *p;
-    char *t;
-
-    p = str;
-    while (*p != '\0') //Tourne tant que la copie de str n'est pas finie
-    {
-        if (*p == c) //Si le carractere actuelle est le même que celui de split
-            count++;
-        p++;
-    }
-
-    *arr = (char**) malloc(sizeof(char*) * count); //Allocation d'un espace mémoire suffisant pour stocker les résultats
-    if ((*arr)[i] == NULL) exit(1);//Si l'allocation a écoué, le programme se ferme immédiatement
-
-    p = str; //Remise de l'état initial de p (car il été usé)
-    while (*p != '\0')//Tourne tant que la copie de str n'est pas finie
-    {
-        if (*p == c) //Si le carractere actuelle est le même que celui de split
-        {
-            (*arr)[i] = (char*) malloc( sizeof(char) * token_len ); //Allocation d'un espace mémoire suffisant pour stocker un résultat
-            if ((*arr)[i] == NULL) exit(1);//Si l'allocation a écoué, le programme se ferme immédiatement
-
-            token_len = 0; //Réinitialisation pour le mot suivant
-            i++;
-        }
-        p++;
-        token_len++;
-    }
-    (*arr)[i] = (char*) malloc( sizeof(char) * token_len );  //Allocation d'un espace mémoire suffisant pour stocker un résultat (mot)
-    if ((*arr)[i] == NULL) exit(1);//Si l'allocation a écoué, le programme se ferme immédiatement
-
-    /*LE VERITABLE SPLIT EST ICI*/
-    i = 0;
-    p = str;  //Remise de l'état initial de p (car il été usé)
-    t = ((*arr)[i]); //T va correspondre au mot actuel de la chaine finale
-    while (*p != '\0') //Tourne tant que la copie de str n'est pas finie (usée)
-    {
-        if (*p != c && *p != '\0') //Si ce n'est pas la fin et que ce n'est pas le caractère de spli
-        {
-            *t = *p; //Le mot actuel peut être incrémenté du caractère suivant
-            t++;
-        }
-        else
-        {
-            *t = '\0'; //Le mot actuel est réinitialisé
-            i++;
-            t = ((*arr)[i]); //T va correspondre au mot actuel de la chaine finale
-        }
-        p++;
-    }
-
-    return count; //Retourne le nombre de splits différents
 }
