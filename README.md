@@ -13,18 +13,8 @@ Une projet d'entrainement en C afin de s’entraîner à exécuter des mandats, 
  5. La dernière étape est de créer une carte comme les modèles de tests se trouvant ci-dessous. Si vous ne voyez pas le dossier "maps" à côté du jeu, veuillez le créer ou lancer et quitter le jeu une fois pour l'initialiser.
  6. Appréciez ces graphismes de l'extrême du mode console en jouant à la bataille navale !
 
-**Map de test :**
-Fichier "**map1.bnmap**"
-0000000000
-0000000000
-0000000000
-0000000000
-0055000000
-0333000001
-0444000001
-0000000001
-0000000001
-0022220001
+**Comment bien créer une carte**
+(Un exemple est dans le dossier des "Fichiers de tests à déplacer")
 
 1. Laissez une ligne vide à la fin de votre carte de 10 par 10
 2. Les bateaux doivent avoir des ID différents allant de 1 à 5
