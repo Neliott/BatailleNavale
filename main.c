@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.2 - Super Bark NOCOLORED Version (Finalisation de la 0.1)
- * Date : 18.03.2020
+ * Version : 1.3 - PLANE HOLDER Version (Finalisation de la 1.0 et fonctions supplémentaires)
+ * Date : 19.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -12,6 +12,7 @@
 #include "string.h" //Ajoute quelques fonctions utiles pour les tableaux de char
 #include <time.h> //Le système servant pour la date
 #include <dirent.h>
+#pragma comment(lib,"winmm.lib") // Ajout d'une libraire supportant les sonds
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -26,7 +27,7 @@ void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(
 int askChoiceMin(int min,int max),askChoiceChar();
 
 /*CONSTANTES DE JEU*/
-const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 const int linesMax = GrildLenght; //Détermination de l'aire de jeu (X)
 const int colsMax = GrildLenght; //Détermination de l'aire de jeu (Y)
 
@@ -71,16 +72,15 @@ void setup(){
     SetConsoleOutputCP(CP_UTF8); //Les accents sont maintenant supportés
     if(!isEditor){
         SetConsoleTitle("Bataille Navale"); //Peut provoquer des erreurs dans la version sur CLION en affichant le contenu dans la console (ceci est maintenant protégé)
-        //system("color 13");//69,67,14,73
     }else{
         printf("ATTENTION !");
-        Sleep(500);
+        Sleep(200);
         printf(" VERSION CLION - EDITEUR ONLY !");
-        Sleep(500);
+        Sleep(200);
         printf(" NE PAS EXECUTER EN DEHORS DU MODE INTEGRE de CLION! ");
-        Sleep(2000);
+        Sleep(200);
         printf("(Changer la constante isEditor)\n");
-        Sleep(4000);
+        Sleep(500);
     }
     /*Création des dossiers requis pour commencer le jeu*/
     mkdir("maps");
@@ -88,7 +88,7 @@ void setup(){
 
     printf("\n");
     clear();
-    //visualEvent(0);
+    visualEvent(0);
 }
 
 /**
@@ -101,7 +101,7 @@ void displayMainMenu(){
     if(isEditor){
         printf("----Menu---- \n");
     }else{
-        //drawer(1,0);
+        drawer(1,0);
     }
     printf("  \n");
 
@@ -156,7 +156,7 @@ void displayHelp(){
     if(isEditor){
         printf("----Aide---- \n");
     }else{
-        //drawer(2,0);
+        drawer(2,0);
     }
 
     /*Affichage des explications*/
@@ -182,7 +182,7 @@ void setScore(){
     if(isEditor){
         printf("----Scores---- \n");
     }else{
-        //drawer(3,0);
+        drawer(3,0);
     }
 
     /*Récupération du pseudo*/
@@ -268,7 +268,7 @@ void displayScores(){
     if(isEditor){
         printf("----Scores---- \n");
     }else{
-        //drawer(3,0);
+        drawer(3,0);
     }
 
     FILE* fichier = NULL;
@@ -372,7 +372,7 @@ void getRandomGame(){
     do {
         clear();
         /*Séléction du choix par l'utilisateur*/
-        printf("Comment souhaitez-vous jouer ?\n");
+        printf("Comment souhaitez-vous jouer ?\n\n");
         printf("1. Choisir la carte de mon choix dans le dossier 'maps'\n");
         printf("2. Prendre une carte aléatoire du dossier 'maps'\n");
         printf("3. Générer une carte aléatoire (non-disponible actuellement)\n");
@@ -564,27 +564,21 @@ void touchBoat(int line,int col){
             /*Actions en fontion du résultat du nombre de bateaux coulés*/
             if(bateauxTouche == gameGrildBoatsNb){//Si il y a autant de bateaux coulés que de bateaux max
                 /*le joueur a gagné*/
-                printf("\nFin de la partie !");
                 endGame();
             }else{
                 /*La partie continue*/
-                //visualEvent(3);
-                Sleep(1000);
+                visualEvent(3);
                 displayGame();
             }
         }else{
             /*Le bateau est juste touché*/
-            printf("Touché !");
-            //visualEvent(2);
-            Sleep(1000);
+            visualEvent(2);
             displayGame();
         }
     }else{
         /*Il n'y a pas de bateaux*/
         gameGrild[line][col] = 1; //Cette case sera maintenant affiché différemement sur la carte du joueur car elle a été découverte
-        printf("Plouf !");
-        //visualEvent(1);
-        Sleep(1000);
+        visualEvent(1);
         displayGame();
     }
 }
@@ -594,7 +588,7 @@ void touchBoat(int line,int col){
  */
 void endGame(){
     showGameGrild();
-    //visualEvent(4);
+    visualEvent(4);
     printf("PARTIE TERMINEE EN %d COUPS ! \n",gameGrildCoups);
     system("pause");
 
@@ -618,8 +612,7 @@ void showGameGrild(){
     printf("\n");
 
     /*Véritable première ligne du tableau*/
-    printf("   ");//Espace de syncronisation (pour que le rendu soit jolis
-    // )
+    printf("   ");//Espace de syncronisation (pour que le rendu soit jolis)
     printf("%s",gameGrildCoinHautGauche);//Affichage cu Coin gauche
     for(int i = 0;i < (colsMax*3)+(colsMax-1);i++){
         printf("%s",gameGrildHorizontal); //Affichage de traîts
@@ -712,7 +705,7 @@ int askChoiceMin(int min,int max){
 }
 
 /**
- * Idem que askChoiceMin mais avec les caractères converti en décimal à l'aide d'une grille
+ * Description : Idem que askChoiceMin mais avec les caractères converti en décimal à l'aide d'une grille
  * @return
  */
 int askChoiceChar(){
@@ -738,4 +731,125 @@ int askChoiceChar(){
         charConverted = askChoiceChar();
     }
     return charConverted;
+}
+
+/* ---- FONCTIONS DE STYLE ET D'EVENEMENT ----*/
+/**
+ * Description : Fonction permettant de gérer différents évènement du jeu (Axé sur le front end)
+ * @param event
+ */
+void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->coulé, 4->Fin de partie)
+    switch (event){
+        case 0://Lancement
+            if(!isEditor){
+                system("color 3E");
+                for(int i=0;i<60;i++){
+                    clear();
+                    drawer(0,i);
+                    Sleep(40);
+                }
+                system("color 1B");
+            }else{
+                printf("Chargement... (version interne seulement - changer la constante isEditor en 1 pour le mode console)");
+                Sleep(2000);
+            }
+            break;
+        case 1://Plouf
+            if(isEditor){
+                printf("Plouf !\n");
+                Sleep(1000);
+            }else{
+                //Evenement visuel ici
+            }
+            break;
+        case 2://Touché
+            if(isEditor){
+                printf("Plouf !\n");
+                Sleep(1000);
+            }else{
+                //Evenement visuel ici
+            }
+            break;
+        case 3://Coulé
+            if(isEditor){
+                printf("Plouf !\n");
+                Sleep(1000);
+            }else{
+                //Evenement visuel ici
+            }
+            break;
+        case 4://Fin de partie
+            if(isEditor){
+                printf("\nFin de la partie !");
+                Sleep(1000);
+            }else{
+                //Evenement visuel ici
+            }
+            break;
+        default:
+            Sleep(1000);
+            break;
+    }
+}
+
+/**
+ * Description : Fonction de dessin d'image en ASCII
+ * @param type : type dîmage à afficher
+ * @param espace : nombres d'espaces depuis le début de la console (gauche)
+ */
+void drawer(int type,int espace){
+    if(type == 0) {
+        printf("%*c                     -=#=-                          \n", espace, 32);
+        printf("%*c                     -####:                         \n", espace, 32);
+        printf("%*c                     -#####*                        \n", espace, 32);
+        printf("%*c                     -######=-                      \n", espace, 32);
+        printf("%*c                     -########:                     \n", espace, 32);
+        printf("%*c                   -*-#########+                    \n", espace, 32);
+        printf("%*c                   ==-##########=                   \n", espace, 32);
+        printf("%*c                  *#=-=##########=-                 \n", espace, 32);
+        printf("%*c                 +##=-############=                 \n", espace, 32);
+        printf("%*c                :###=-=############=                \n", espace, 32);
+        printf("%*c            -=:-####=-=#############=               \n", espace, 32);
+        printf("%*c           *#+-==###=-=##############=              \n", espace, 32);
+        printf("%*c         +##= *##==#=-=###############*             \n", espace, 32);
+        printf("%*c       -=##=-*#####==-=################*            \n", espace, 32);
+        printf("%*c      *####::#######=-=#################+           \n", espace, 32);
+        printf("%*c    :#####+-########=-===################+          \n", espace, 32);
+        printf("%*c   =#####=-=########= =###################:         \n", espace, 32);
+        printf("%*c          -+::---      --:::+**===#########:        \n", espace, 32);
+        printf("%*c:::::---------:**:-    ---:++**==****+:             \n", espace, 32);
+        printf("%*c:======================================*++:         \n", espace, 32);
+        printf("%*c  -*===================================***-         \n", espace, 32);
+        printf("%*c     :==============================*=***           \n", espace, 32);
+        printf("%*c       :=========================***==              \n", espace, 32);
+
+        printf("   ___  _                                                       _    \n");
+        printf("  / __|| |__    __ _  _ __  __ _   ___  _ __ ___    ___  _ __  | |_  \n");
+        printf(" / /   | '_ |  / _` || '__|/ _` | / _ || '_ ` _ |  / _ || '_ | | __| \n");
+        printf("/ /___ | | | || (_| || |  | (_| ||  __/| | | | | ||  __/| | | || |_  \n");
+        printf("|____/ |_| |_| |__,_||_|   |__, |||___||_| |_| |_| |___||_| |_| |__| ");
+        for (int i = 0; i < espace % 6; i++) {
+            printf("○");
+        }
+        printf("\n");
+        printf("                           |___/                                     ");
+    }else if(type == 1){
+        printf("%*c /$$$$$$$              /$$               /$$ /$$ /$$              /$$   /$$                               /$$          \n", espace, 32);
+        printf("%*c| $$__  $$            | $$              |__/| $$| $$             | $$$ | $$                              | $$          \n", espace, 32);
+        printf("%*c| $$  | $$  /$$$$$$  /$$$$$$    /$$$$$$  /$$| $$| $$  /$$$$$$    | $$$$| $$  /$$$$$$  /$$    /$$ /$$$$$$ | $$  /$$$$$$ \n", espace, 32);
+        printf("%*c| $$$$$$$  |____  $$|_  $$_/   |____  $$| $$| $$| $$ /$$__  $$   | $$ $$ $$ |____  $$|  $$  /$$/|____  $$| $$ /$$__  $$\n", espace, 32);
+        printf("%*c| $$__  $$  /$$$$$$$  | $$      /$$$$$$$| $$| $$| $$| $$$$$$$$   | $$  $$$$  /$$$$$$$ |  $$/$$/  /$$$$$$$| $$| $$$$$$$$\n", espace, 32);
+        printf("%*c| $$  | $$ /$$__  $$  | $$ /$$ /$$__  $$| $$| $$| $$| $$_____/   | $$|  $$$ /$$__  $$  |  $$$/  /$$__  $$| $$| $$_____/\n", espace, 32);
+        printf("%*c| $$$$$$$/|  $$$$$$$  |  $$$$/|  $$$$$$$| $$| $$| $$|  $$$$$$$   | $$ |  $$|  $$$$$$$   |  $/  |  $$$$$$$| $$|  $$$$$$$\n", espace, 32);
+        printf("%*c|_______/  |_______/   |___/   |_______/|__/|__/|__/ |_______/   |__/  |__/ |_______/    |_/    |_______/|__/ |_______/\n", espace, 32);
+    }else if(type == 2){
+        printf("%*c  /$$$$$$  /$$       /$$          \n", espace, 32);
+        printf("%*c /$$__  $$|__/      | $$          \n", espace, 32);
+        printf("%*c| $$  | $$ /$$  /$$$$$$$  /$$$$$$ \n", espace, 32);
+        printf("%*c| $$$$$$$$| $$ /$$__  $$ /$$__  $$\n", espace, 32);
+        printf("%*c| $$__  $$| $$| $$  | $$| $$$$$$$$\n", espace, 32);
+        printf("%*c| $$  | $$| $$| $$  | $$| $$_____/\n", espace, 32);
+        printf("%*c| $$  | $$| $$|  $$$$$$$|  $$$$$$$\n", espace, 32);
+        printf("%*c|__/  |__/|__/ |_______/ |_______/\n", espace, 32);
+    }
 }
