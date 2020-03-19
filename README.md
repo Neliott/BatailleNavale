@@ -23,4 +23,4 @@ Une projet d'entrainement en C afin de s’entraîner à exécuter des mandats, 
 1. Laissez une ligne vide à la fin de votre carte de 10 par 10
 2. Les bateaux doivent avoir des ID différents allant de 1 à 5
 3. Il n'est pas nécessaire de suivre un ordre de grandeur officiel car cela est calculé en temps réel dans le jeu (Exemple : un bateau peut n'avoir qu'une case _Très petit bateau_ ou 7 cases _Énorme bateau_)
-4. Préférez l'encodage UTF-8 SANS BOM c'est cela est possible.
+4. Préférez l'encodage UTF-8 SANS BOM si cela est possible.
