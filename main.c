@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.3 - PLANE HOLDER Version (Finalisation de la 1.0 et fonctions supplémentaires)
- * Date : 19.03.2020
+ * Version : 1.3.2 - PLANE HOLDER Version (Finalisation de la 1.0 et fonctions supplémentaires)
+ * Date : 23.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -23,11 +23,12 @@
 #define GrildLenght 10 //La longueur de la grille de jeu (carrée)
 
 /*Génériques de fonctions*/
-void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace);
+void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),logAction(int typeEvent,char * texte),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace);
 int askChoiceMin(int min,int max),askChoiceChar();
 
 /*CONSTANTES DE JEU*/
-const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+const int enablePrintLogsInConsole = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 const int linesMax = GrildLenght; //Détermination de l'aire de jeu (X)
 const int colsMax = GrildLenght; //Détermination de l'aire de jeu (Y)
 
@@ -62,6 +63,7 @@ int gameGrildBoats[GrildLenght][GrildLenght];//La carte du niveau entier est ici
 int main() {
     setup();
     displayMainMenu();
+    logAction(1,"Fin du jeu sans erreur");
     return 0;
 }
 
@@ -69,6 +71,7 @@ int main() {
  * Description : Cette fonction est executée lors du démarage du programme pour assurer son bon fonctionnement
  */
 void setup(){
+    logAction(1,"Lancement du jeu");
     SetConsoleOutputCP(CP_UTF8); //Les accents sont maintenant supportés
     if(!isEditor){
         SetConsoleTitle("Bataille Navale"); //Peut provoquer des erreurs dans la version sur CLION en affichant le contenu dans la console (ceci est maintenant protégé)
@@ -83,6 +86,7 @@ void setup(){
         Sleep(500);
     }
     /*Création des dossiers requis pour commencer le jeu*/
+    logAction(1,"Création des dossiers requis au démarage");
     mkdir("maps");
     mkdir("gameassets");
 
@@ -95,6 +99,7 @@ void setup(){
  * Description : Affiche le menu et traîte le choix de l'utilisateur
  */
 void displayMainMenu(){
+    logAction(2,"Affichage du menu");
     clear();
 
     /*Affichage de l'entête*/
@@ -150,6 +155,7 @@ void displayMainMenu(){
  * Description : Affichage d'un menu d'aide expliquant les règles de la bataille navale
  */
 void displayHelp(){
+    logAction(2,"Affichage de l'aide");
     clear();
 
     /*Affichage de l'entête*/
@@ -176,6 +182,7 @@ void displayHelp(){
  * Description : Une fonction qui stocke le dernier score fait par le joueur dans un fichier
  */
 void setScore(){
+    logAction(3,"Définition du score");
     clear();
 
     /*Affichage de l'entête*/
@@ -186,10 +193,26 @@ void setScore(){
     }
 
     /*Récupération du pseudo*/
+    logAction(3,"Demande d'un pseudo");
     char pseudo[63];
-
-    printf("Veuillez entrer un pseudo : \n");
-    scanf("%63s", &pseudo);
+    int isValidPseudo;
+    do{
+        isValidPseudo = 1;
+        printf("Veuillez entrer un pseudo : \n");
+        scanf("%63s", &pseudo);
+        for(int i = 0;i<strlen(pseudo) ;i++){
+            if(pseudo[i] == ';' && isValidPseudo == 1){
+                isValidPseudo = 0;
+                printf("VOUS NE POUVEZ PAS AVOIR DE PSEUDO CONTENANT UN ; !\n");
+                logAction(3,"Le pseudo contient un ;");
+            }
+        }
+        if(strlen(pseudo) < 3 && isValidPseudo == 1){
+            isValidPseudo = 0;
+            printf("VOTRE PSEUDO DOIT ETRE ENTRE 3 ET 64 CARACTERES !\n");
+            logAction(3,"Le pseudo est plus petit que 3 caractères");
+        }
+    } while(isValidPseudo == 0);
 
     /*Vidage du scanf si il y a un débordement*/
     int voider; //La variable la plus temporaire que je n'ai jamais vue.
@@ -203,6 +226,7 @@ void setScore(){
     int score = gameGrildCoups; //Le système de score sera plus poussé pas la suite
 
     /*Enregistrement du score*/
+    logAction(1,"Enregistrement du score");
     mkdir("gameassets");//Création du dossier (Au cas ou il ne le serait plus - supprimé entre temps)
 
     /*Ouverture du fichier*/
@@ -247,6 +271,7 @@ void setScore(){
         fclose(fp3);//Fermeture du fichier
     }else{
         printf("Fichier non-trouvé ! Création.");
+        logAction(1,"Le fichier n'est pas trouvé. Création...");
         fclose(fichier);
 
         /*Création d'un nouveau fichier*/
@@ -255,6 +280,7 @@ void setScore(){
         fprintf(fichier2, ";%s;%d;%d.%02d.%02d -  %02d:%02d;\n", pseudo, gameGrildCoups, tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
         fclose(fichier2);
     }
+    logAction(1,"Score enregistré dans le fichier avec succès !");
     system("pause");
 }
 
@@ -262,6 +288,7 @@ void setScore(){
  * Description : Affichage des derniers scores depuis un fichier externe
  */
 void displayScores(){
+    logAction(2,"Affichage des scores");
     clear();
 
     /*Affichage de l'entête*/
@@ -272,10 +299,13 @@ void displayScores(){
     }
 
     FILE* fichier = NULL;
+    logAction(1,"Mise en place du dossier");
     mkdir("gameassets");
+    logAction(1,"Ouverture du fichier");
     fichier = fopen("./gameassets/scores.bn", "r+");//Ouverture du fichier dans le mode LECTURE/ECRITURE
 
     if(fichier!= NULL){//Si le fichier existe
+        logAction(1,"Fichier de scores trouvé");
         int nbLines = 0; //Nombres de lignes dans le fichier
         char lines[MaxScoresDispalyed][128];//Le contenu du fichier ligne par ligne
 
@@ -285,6 +315,7 @@ void displayScores(){
         char* pointS[MaxScoresDispalyed];
 
         /*Vidage de tous les caractères précédemment stocké dans la mémoire*/
+        logAction(1,"Initialisation des tableaux");
         for(int i = 0;i<MaxScoresDispalyed;i++){
             for(int leng = 0;leng<128;leng++){
                 lines[i][leng] = ' ';
@@ -292,6 +323,7 @@ void displayScores(){
         }
 
         /*Récupération du nombre de lignes du fichier et séparation des lignes dans un tableau à 2 dimenstions*/
+        logAction(1,"Récupération des lignes");
         while(fgets(lines[nbLines], strlen(lines[nbLines]), fichier))
         {
             if(nbLines < MaxScoresDispalyed-1){
@@ -301,6 +333,7 @@ void displayScores(){
         }
 
         /*Séparation de la date, des points et des pseudos depuis les lignes*/
+        logAction(1,"Séparation des informations");
         for(int i = 0; i < nbLines; ++i)
         {
             /*  https://www.educative.io/edpresso/splitting-a-string-using-strtok-in-c  */
@@ -319,12 +352,14 @@ void displayScores(){
             date[i] = strg[2];
         }
         /*Affichage des scores*/
+        logAction(2,"Affichage des scores au joueur");
         printf("DATE/HEURE\t\tCOUPS\tPSEUDO\n");
         for(int i = 0;i<nbLines;i++){
             printf("%s\t%s\t%s\n",date[i],pointS[i],names[i]);
         }
         fclose(fichier);
     }else{
+        logAction(1,"Aucun fichier de scores trouvé");
         printf("DATE/HEURE\tCOUPS\tPSEUDO\n");
         printf("Aucun résulta.\n");
     }
@@ -336,9 +371,13 @@ void displayScores(){
  * Description : Fonction s'executant au démarage d'une partie pour remettre des variables de précédantes parties à leur état initial.
  */
 void setupGame(){
+    logAction(1,"Démarage d'une partie");
     gameGrildCoups = 0;//Le joueur n'a pas encore joué de coups
+    logAction(3,"Attente du retour de la carte choisie...");
     getRandomGame(); //Prends une carte au hasard d'un sous-dossier
 
+    logAction(3,"Carte initialisée...");
+    logAction(1,"Mise de la carte dans les tableaux de jeux");
     /*Remise à 0 de la grille du joueur*/
     for(int lines=0;lines<linesMax;lines++){
         for(int cols=0;cols<colsMax;cols++){
@@ -349,7 +388,7 @@ void setupGame(){
     for(int i=0;i<gameGrildBoatsNb;i++){
         gameGrildBoatsHit[i] = 0;
     }
-
+    logAction(1,"Remise à zéro des tableaux terminée");
     /*Calculation du nombre de zones totales par bateau*/
     for(int i=0;i<gameGrildBoatsNb;i++){ //Vidage de précédentes valeurs
         gameGrildBoatsLenght[i] = 0;
@@ -361,17 +400,21 @@ void setupGame(){
             }
         }
     }
+    logAction(1,"Fin de la manipulation des tableaux");
+    logAction(3,"Carte opérationnelle");
     displayGame();
 }
 /**
  * Descriptino : Récupère une partie existante à partir d'un fichier ou demande à l'utilisateur de la choisir
  */
 void getRandomGame(){
+    logAction(1,"Démarage du choix de la carte");
     char pathFile[128] = "./maps/"; //Le chemin d'acces à la carte
     int hasValidFile = 0;
     do {
         clear();
         /*Séléction du choix par l'utilisateur*/
+        logAction(2,"Demande de la méthode de jeu à l'utilisateur");
         printf("Comment souhaitez-vous jouer ?\n\n");
         printf("1. Choisir la carte de mon choix dans le dossier 'maps'\n");
         printf("2. Prendre une carte aléatoire du dossier 'maps'\n");
@@ -386,6 +429,7 @@ void getRandomGame(){
 
             if (rep != NULL)//Si le répertoire existe
             {
+                logAction(1,"Mise en place des tableaux");
                 struct dirent *ent;//Création d'une structure d'un fichier
 
                 int nbFiles = 0;//Nombre de fichiers listé dans le dossier en question
@@ -401,6 +445,7 @@ void getRandomGame(){
                 clear();
                 /*Affichage des carte trouvées dans tout les cas*/
                 printf("----Cartes trouvées----\n\n");
+                logAction(2,"Affichage des cartes trouvées");
 
                 while ((ent = readdir(rep)) != NULL)//Tourne tant qu'il reste des fichier qui n'ont pas été pris
                 {
@@ -416,6 +461,7 @@ void getRandomGame(){
                 closedir(rep);//Fermeture de la gestion du répertoire (étant donné qi'il y a déja un tablea avec tous les ficheirs dedans)
 
                 if (nbFiles == 0) {//Si il n'y a pas de fichiers trouvés
+                    logAction(1,"Aucun fichier n'a été trouvé");
                     printf("Oops ! Aucune carte n'a été trouvé dans le dossier 'maps'.\n");
                     printf("Veuillez mettre une carte en .bnmap (utf-8 sans BOM vivement conseillé) dedans pour continuer...\n");
                     system("pause");
@@ -423,6 +469,7 @@ void getRandomGame(){
                 } else {
                     if (choix == 1) {//Si le joueur veut choisir sa carte
                         /*Selection du joueur*/
+                        logAction(2,"Demande du nom de la carte à charger");
                         printf("\nVeuillez entrer le nom de la carte :\n");
                         char file[64] = "";
                         scanf("%62s", file);
@@ -441,12 +488,14 @@ void getRandomGame(){
                             }
                         }
                         if(founded == 0){//Si aucune cartte ne correspond
+                            logAction(1,"La carte choisie n'est pas trouvée");
                             printf("Carte non-trouvée !\n");
                             system("pause");
                             hasValidFile = 0;
                         }
                     }
                     if (choix == 2) {//Prise d'une carte aléatoire
+                        logAction(1,"Prise d'une carte aléatoire");
                         srand(time(NULL));
                         int random = (rand() % nbFiles);
                         strcat(pathFile, filesFounded[random]);//Ajout du chemin d'accès au dossier + le fichier poru avoir un chemin d'accès complet j'usqu'au fichier
@@ -454,6 +503,7 @@ void getRandomGame(){
                     }
                 }
             } else {
+                logAction(1,"Le dossier 'maps' n'a pas été trouvé");
                 mkdir("maps"); //Ce cas arrive seulement si le joueur supprime le dossier entre temps.
                 printf("Oops ! Le dossier 'maps' n'a pas été trouvé. Il viens donc d'être créé.'\n");
                 printf("Veuillez mettre une carte en .bnmap dedans pour continuer...\n");
@@ -465,7 +515,7 @@ void getRandomGame(){
 
 
     /*Traîtement et importation du niveau*/
-
+    logAction(1,"Ouverture de la carte");
     printf("Ouverture de : %s\n",pathFile);
 
     FILE* fichier = NULL;
@@ -487,9 +537,12 @@ void getRandomGame(){
                 gameGrildBoats[i][placeColone] = (int) strtol(&ch, NULL, 10);
             }
         }
+        logAction(1,"Le tableau des bateaux a été traîté avec succès");
     }else{
         printf("Oops ! Une erreur est survenue ! Le fichier précédemment trouvé n'est plus disponible. Essayez de redémarer le jeu pour régler le problème.\n");
+        logAction(0,"Le fichier précédemment trouvé n'est plus disponible. Essayez de redémarer le jeu pour régler le problème.");
         system("pause");
+
         exit(1);
     }
 }
@@ -498,17 +551,19 @@ void getRandomGame(){
  * Description : Fonction s'éxecutant à chaques tours durant une partie
  */
 void displayGame(){
+
     /*Valeurs où le joueur va décider d'envoyer un missile*/
     int lineAttack = -1;
     int colAttack = -1;
 
     int isCaseValid = 0;//Si la case que le joueur a choisi n'a pas déjà été jouée
 
+    logAction(2,"Affichage de la grille de jeu");
     showGameGrild();//Affichage de la grille de jeu (joueur)
-    do {
-        printf("Entrez la colone à attaquer :");
-        colAttack = askChoiceChar(); //Le scanf seulement n'étant pas suffisant pour cette requête, une fonction spéciale de traîtement a été créée (Demande à l'utilisateur et transforme son choix en une valeur INT utilisable pour tableau)
 
+    do {
+        logAction(3,"Le joueur entre une position...");
+        colAttack = askChoiceChar(); //Le scanf seulement n'étant pas suffisant pour cette requête, une fonction spéciale de traîtement a été créée (Demande à l'utilisateur et transforme son choix en une valeur INT utilisable pour tableau)
         /*Remise au même état que si la précédante commande n'avait pas existé (Plus jolis et prends moins de place)*/
         showGameGrild();
 
@@ -542,8 +597,6 @@ void touchBoat(int line,int col){
 
         if(gameGrildBoatsHit[boatType] == gameGrildBoatsLenght[boatType]){ //Si le bateau est coulé (qu'il y a autant de zones touchées que de zones totales)
             /*Affichage de retours pour le joueur*/
-            printf("Coulé !");
-
             for(int lines=0;lines<linesMax;lines++){//Le bateau qui vient de couler sera maintenant affiché différemement sur la carte du joueur
                 for(int cols=0;cols<colsMax;cols++){
                     if(gameGrildBoats[lines][cols] == boatType+1){ //Recherche de toutes les cases avec le même ID
@@ -564,19 +617,23 @@ void touchBoat(int line,int col){
             /*Actions en fontion du résultat du nombre de bateaux coulés*/
             if(bateauxTouche == gameGrildBoatsNb){//Si il y a autant de bateaux coulés que de bateaux max
                 /*le joueur a gagné*/
+                logAction(3,"Le joueur a coulé le dernier bateau");
                 endGame();
             }else{
                 /*La partie continue*/
+                logAction(3,"Le joueur a coulé un bateau");
                 visualEvent(3);
                 displayGame();
             }
         }else{
             /*Le bateau est juste touché*/
+            logAction(3,"Le joueur a touché un bateau");
             visualEvent(2);
             displayGame();
         }
     }else{
         /*Il n'y a pas de bateaux*/
+        logAction(3,"Le joueur n'a rien touché");
         gameGrild[line][col] = 1; //Cette case sera maintenant affiché différemement sur la carte du joueur car elle a été découverte
         visualEvent(1);
         displayGame();
@@ -590,6 +647,7 @@ void endGame(){
     showGameGrild();
     visualEvent(4);
     printf("PARTIE TERMINEE EN %d COUPS ! \n",gameGrildCoups);
+    logAction(3,"FIN DE PARTIE !");
     system("pause");
 
     clear();
@@ -685,6 +743,29 @@ void clear(){
 }
 
 /**
+ * Description : Une fcontion qui stoque automatiquement les logs dans un fichier
+ * @param typeEvent le type d' entre 0 et 3
+ * @param texte la descruption
+ */
+void logAction(int typeEvent,char * texte){
+    char eventName[4][64] = {"FATAL ERROR","BOOT AND LOW-SYSTEMS","UI SYSTEM AND MANAGER","GAME EVENT"};
+
+    //Récupération de la date actuelle
+    time_t t = time(NULL); //https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program
+    struct tm tm = *localtime(&t);//Prise de l'instance de l'heure locale dans une structure
+
+    if(enablePrintLogsInConsole){
+        printf("\n %d.%02d.%02d à %02d:%02d %s - %s : %s \n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min,eventName[typeEvent],texte);
+    }
+    /*OUVERTURE DU FICHIER*/
+    FILE* fichier = NULL;
+
+    fichier = fopen("logs.txt", "a");
+    fprintf(fichier,"%d.%02d.%02d à %02d:%02d - %s : %s\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min,eventName[typeEvent],texte);
+    fclose(fichier);
+}
+
+/**
 *  Description : Permet de mieux traîter les choix que la manière native avec scanf seulement (vidage du scanf, gestion de problèmes et limitation de la saisie entre Min et Max)
 */
 int askChoiceMin(int min,int max){
@@ -764,7 +845,7 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             break;
         case 2://Touché
             if(isEditor){
-                printf("Plouf !\n");
+                printf("Touché !\n");
                 Sleep(1000);
             }else{
                 //Evenement visuel ici
@@ -772,7 +853,7 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             break;
         case 3://Coulé
             if(isEditor){
-                printf("Plouf !\n");
+                printf("Coulé !\n");
                 Sleep(1000);
             }else{
                 //Evenement visuel ici
