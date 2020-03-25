@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.3.2 - PLANE HOLDER Version (Finalisation de la 1.0 et fonctions supplémentaires)
- * Date : 23.03.2020
+ * Version : 1.3.3 - PLANE HOLDER Version (Finalisation de la 1.0 et fonctions supplémentaires)
+ * Date : 25.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -12,18 +12,20 @@
 #include "string.h" //Ajoute quelques fonctions utiles pour les tableaux de char
 #include <time.h> //Le système servant pour la date
 #include <dirent.h>
-#pragma comment(lib,"winmm.lib") // Ajout d'une libraire supportant les sonds
+#include <mmsystem.h>
+#include <windowsx.h>
 #include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+//# pragma comment(lib,"winmm.lib")
 
 /*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
 #define MaxScoresDispalyed 100 //Le nombre maximum de scores affichés
 #define GrildLenght 10 //La longueur de la grille de jeu (carrée)
 
 /*Génériques de fonctions*/
-void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),logAction(int typeEvent,char * texte),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace);
+void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),logAction(int typeEvent,char * texte),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace),playASound(int id);
 int askChoiceMin(int min,int max),askChoiceChar();
 
 /*CONSTANTES DE JEU*/
@@ -71,6 +73,7 @@ int main() {
  * Description : Cette fonction est executée lors du démarage du programme pour assurer son bon fonctionnement
  */
 void setup(){
+    playASound(1);
     logAction(1,"Lancement du jeu");
     SetConsoleOutputCP(CP_UTF8); //Les accents sont maintenant supportés
     if(!isEditor){
@@ -93,6 +96,7 @@ void setup(){
     printf("\n");
     clear();
     visualEvent(0);
+    playASound(0);
 }
 
 /**
@@ -872,7 +876,21 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             break;
     }
 }
-
+/**
+ *  Description : Fonction facilitant la gestion des sons
+ * @param id : L'id du son
+ */
+void playASound(int id){
+    switch(id){
+        case 1:
+            //PlaySound("CLIP0_START.wav", NULL, SND_FILENAME | SND_ASYNC);
+            break;
+        case 0:
+        default:
+            //PlaySound(NULL, NULL, 0);
+            break;
+    }
+}
 /**
  * Description : Fonction de dessin d'image en ASCII
  * @param type : type dîmage à afficher
