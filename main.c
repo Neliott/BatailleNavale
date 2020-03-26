@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.3.3 - PLANE HOLDER Version (Finalisation de la 1.0 et fonctions supplémentaires)
- * Date : 25.03.2020
+ * Version : 1.4.0 - Pixelated Boat Style Version (Mise en place des couleurs et des sons)
+ * Date : 26.03.2020
 */
 
 #include <stdio.h> //Par défaut
@@ -18,7 +18,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-//# pragma comment(lib,"winmm.lib")
 
 /*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
 #define MaxScoresDispalyed 100 //Le nombre maximum de scores affichés
@@ -29,7 +28,8 @@ void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),logAction(int 
 int askChoiceMin(int min,int max),askChoiceChar();
 
 /*CONSTANTES DE JEU*/
-const int isEditor = 1; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
+int isAudio = 1; //Activer ou désactiver l'audio
 const int enablePrintLogsInConsole = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 const int linesMax = GrildLenght; //Détermination de l'aire de jeu (X)
 const int colsMax = GrildLenght; //Détermination de l'aire de jeu (Y)
@@ -65,7 +65,6 @@ int gameGrildBoats[GrildLenght][GrildLenght];//La carte du niveau entier est ici
 int main() {
     setup();
     displayMainMenu();
-    logAction(1,"Fin du jeu sans erreur");
     return 0;
 }
 
@@ -73,7 +72,6 @@ int main() {
  * Description : Cette fonction est executée lors du démarage du programme pour assurer son bon fonctionnement
  */
 void setup(){
-    playASound(1);
     logAction(1,"Lancement du jeu");
     SetConsoleOutputCP(CP_UTF8); //Les accents sont maintenant supportés
     if(!isEditor){
@@ -92,11 +90,27 @@ void setup(){
     logAction(1,"Création des dossiers requis au démarage");
     mkdir("maps");
     mkdir("gameassets");
-
+    DIR* dir = opendir("sounds");
+    if (!dir) {//L'utilisateur n'a pas de sons
+        isAudio = 0;
+        logAction(1,"Aucun audio detecté.");
+        if(!isEditor){//Si l'utilisateur n'a pas de sons et qu'il est en mode console,
+            printf("Bienvenue sur la bataille navale ! Dans l'état actuel, vous pouvez lancer l'application mais vous ne pourrez pas profiter de tous ces avantages ! Si vous désirez avoir une expérience optimale, veuillez ajouter le dossier 'sounds' avec tout son contenu pris depuis github. \n");
+            printf("SI VOUS AVEZ AJOUTE LE DOSSIER ET QUE VOUS REVOYEZ CETTE FENETRE, CONTACTEZ LE DEVELOPPEUR. (Ou changez l'état par défaut de la variable isAudio à 1 dans le fichier main.c)\n");
+            printf("Que voulez-vous faire ?\n");
+            printf("1. Je veux jouer sans les sonds (expérience non-optimale)\n");
+            printf("2. Ouvrir le github du projet et fermer l'application\n");
+            int choixOpener = askChoiceMin(1,2);
+            if(choixOpener == 2){//Si l'utilisateur désire avoir accès au github pour prendre le dossier des sonds.
+                system("explorer https://github.com/EliottJaquierCPNV/BatailleNavale");
+                logAction(0,"Le joueur a voulu quitter l'application et aller sur github pour télecharger les sons du projet.");
+                exit(1);
+            }
+        }
+    }
     printf("\n");
     clear();
     visualEvent(0);
-    playASound(0);
 }
 
 /**
@@ -105,6 +119,8 @@ void setup(){
 void displayMainMenu(){
     logAction(2,"Affichage du menu");
     clear();
+    playASound(2);
+    playASound(3);
 
     /*Affichage de l'entête*/
     if(isEditor){
@@ -138,10 +154,11 @@ void displayMainMenu(){
             break;
         case 4:
             system("explorer https://www.eliott.pro/liens.php");
-            printf("Naviguateur non-trouvé");
             displayMainMenu();
             break;
         case 5:
+            playASound(0);
+            logAction(1,"Fin du jeu sans erreur");
             printf("Fermeture...\n");
             break;
         /*case 6:
@@ -159,6 +176,7 @@ void displayMainMenu(){
  * Description : Affichage d'un menu d'aide expliquant les règles de la bataille navale
  */
 void displayHelp(){
+    playASound(3);
     logAction(2,"Affichage de l'aide");
     clear();
 
@@ -292,6 +310,7 @@ void setScore(){
  * Description : Affichage des derniers scores depuis un fichier externe
  */
 void displayScores(){
+    playASound(3);
     logAction(2,"Affichage des scores");
     clear();
 
@@ -299,8 +318,9 @@ void displayScores(){
     if(isEditor){
         printf("----Scores---- \n");
     }else{
-        drawer(3,0);
+        drawer(4,0);
     }
+    printf("\n");
 
     FILE* fichier = NULL;
     logAction(1,"Mise en place du dossier");
@@ -375,6 +395,7 @@ void displayScores(){
  * Description : Fonction s'executant au démarage d'une partie pour remettre des variables de précédantes parties à leur état initial.
  */
 void setupGame(){
+    playASound(3);
     logAction(1,"Démarage d'une partie");
     gameGrildCoups = 0;//Le joueur n'a pas encore joué de coups
     logAction(3,"Attente du retour de la carte choisie...");
@@ -825,15 +846,32 @@ int askChoiceChar(){
  */
 void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->coulé, 4->Fin de partie)
     switch (event){
-        case 0://Lancement
+        case 0://Animation de lancement
             if(!isEditor){
+                clear();//Bataille Navale
+                playASound(1);
+                system("color F0");
+                drawer(1,0);
+                Sleep(250);
+                system("color 04");
+                Sleep(2250);
+
+                clear();//Par Eliott
+                system("color F0");
+                drawer(3,0);
+                Sleep(250);
+                system("color 04");
+                Sleep(2250);
+
+                clear();//Animation de chargement
                 system("color 3E");
-                for(int i=0;i<60;i++){
+                for(int i=0;i<50;i++){
                     clear();
                     drawer(0,i);
-                    Sleep(40);
+                    Sleep(20);
                 }
                 system("color 1B");
+                playASound(0);
             }else{
                 printf("Chargement... (version interne seulement - changer la constante isEditor en 1 pour le mode console)");
                 Sleep(2000);
@@ -881,14 +919,22 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
  * @param id : L'id du son
  */
 void playASound(int id){
-    switch(id){
-        case 1:
-            //PlaySound("CLIP0_START.wav", NULL, SND_FILENAME | SND_ASYNC);
-            break;
-        case 0:
-        default:
-            //PlaySound(NULL, NULL, 0);
-            break;
+    if(isAudio && !isEditor){
+        switch(id){
+            case 1:
+                system("start /min %cd%/sounds/sounder.exe /id start /stopbyid %cd%/sounds/CLIP0_START.wav");
+                break;
+            case 2:
+                system("start /min %cd%/sounds/sounder.exe /id 4dist /loop 100 /stopbyid %cd%/sounds/CLIP4_DIST.wav");
+                break;
+            case 3:
+                system("start /min %cd%/sounds/sounder.exe /id click /stopbyid %cd%/sounds/s7.wav");
+                break;
+            case 0:
+            default:
+                system("start /min %cd%/sounds/sounder.exe /stop");
+                break;
+        }
     }
 }
 /**
@@ -950,5 +996,23 @@ void drawer(int type,int espace){
         printf("%*c| $$  | $$| $$| $$  | $$| $$_____/\n", espace, 32);
         printf("%*c| $$  | $$| $$|  $$$$$$$|  $$$$$$$\n", espace, 32);
         printf("%*c|__/  |__/|__/ |_______/ |_______/\n", espace, 32);
+    }else if(type == 3){
+        printf("%*c /$$$$$$$                                     /$$ /$$             /$$     /$$    \n", espace, 32);
+        printf("%*c| $$__  $$                                   | $$|__/            | $$    | $$    \n", espace, 32);
+        printf("%*c| $$  | $$ /$$$$$$   /$$$$$$         /$$$$$$ | $$ /$$  /$$$$$$  /$$$$$$ /$$$$$$  \n", espace, 32);
+        printf("%*c| $$$$$$$/|____  $$ /$$__  $$       /$$__  $$| $$| $$ /$$__  $$|_  $$_/|_  $$_/  \n", espace, 32);
+        printf("%*c| $$____/  /$$$$$$$| $$  |__/      | $$$$$$$$| $$| $$| $$  | $$  | $$    | $$    \n", espace, 32);
+        printf("%*c| $$      /$$__  $$| $$            | $$_____/| $$| $$| $$  | $$  | $$ /$$| $$ /$$\n", espace, 32);
+        printf("%*c| $$     |  $$$$$$$| $$            |  $$$$$$$| $$| $$|  $$$$$$/  |  $$$$/|  $$$$/\n", espace, 32);
+        printf("%*c|__/      |_______/|__/             |_______/|__/|__/ |______/    |___/   |___/  \n", espace, 32);
+    }else if(type == 4){
+        printf("%*c  /$$$$$$                                                   \n", espace, 32);
+        printf("%*c /$$__  $$                                                  \n", espace, 32);
+        printf("%*c| $$  |__/  /$$$$$$$  /$$$$$$   /$$$$$$   /$$$$$$   /$$$$$$$\n", espace, 32);
+        printf("%*c|  $$$$$$  /$$_____/ /$$__  $$ /$$__  $$ /$$__  $$ /$$_____/\n", espace, 32);
+        printf("%*c |____  $$| $$      | $$  | $$| $$  |__/| $$$$$$$$|  $$$$$$ \n", espace, 32);
+        printf("%*c /$$  | $$| $$      | $$  | $$| $$      | $$_____/ |____  $$\n", espace, 32);
+        printf("%*c|  $$$$$$/|  $$$$$$$|  $$$$$$/| $$      |  $$$$$$$ /$$$$$$$/\n", espace, 32);
+        printf("%*c |______/  |_______/ |______/ |__/       |_______/|_______/ \n", espace, 32);
     }
 }
