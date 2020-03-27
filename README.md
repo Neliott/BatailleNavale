@@ -11,7 +11,7 @@ Une projet d'entrainement en C afin de s’entraîner à exécuter des mandats, 
  
       4.1 - Si vous décidez d'avoir une version optimisée pour CLION, ne changez rien et lancez l'application directement depuis l'éditeur.
  
-      4.2 - Si vous desirez avoir accès à toutes les fonctionnalités en bêta (couleur, animation ou encore des sonds), lancez le .exe en externe. Si vous faites cela veuillez régler la constante du jeu "isEditor" sur 1.
+      4.2 - Si vous desirez avoir accès à toutes les fonctionnalités en bêta (couleur, animation ou encore des sonds), lancez le .exe en externe. Si vous faites cela veuillez régler la constante du jeu "isEditor" sur 0. Il est également conseillé de mettre le répertoire des sounds se trouvant dans le "dossier de tests à déplacer" à côté du .exe pour profiter des sons.
  
  5. La dernière étape est de créer une carte comme les modèles de tests se trouvant ci-dessous. Si vous ne voyez pas le dossier "maps" à côté du jeu, veuillez le créer ou lancer et quitter le jeu une fois pour l'initialiser.
  
