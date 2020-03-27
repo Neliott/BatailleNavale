@@ -2,11 +2,11 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.4.0 - Pixelated Boat Style Version (Mise en place des couleurs et des sons)
- * Date : 26.03.2020
+ * Version : 1.4.1 - Pixelated Boat Style Version (Mise en place des couleurs et des sons)
+ * Date : 27.03.2020
 */
-
-#include <stdio.h> //Par défaut
+/*Bibliothèques par défaut*/
+#include <stdio.h>
 #include <stdlib.h>
 #include "windows.h" //Gérer les commandes console
 #include "string.h" //Ajoute quelques fonctions utiles pour les tableaux de char
@@ -18,45 +18,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
-/*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
-#define MaxScoresDispalyed 100 //Le nombre maximum de scores affichés
-#define GrildLenght 10 //La longueur de la grille de jeu (carrée)
-
-/*Génériques de fonctions*/
-void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),logAction(int typeEvent,char * texte),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),drawer(int type,int espace),playASound(int id);
-int askChoiceMin(int min,int max),askChoiceChar();
-
-/*CONSTANTES DE JEU*/
-const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
-int isAudio = 1; //Activer ou désactiver l'audio
-const int enablePrintLogsInConsole = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
-const int linesMax = GrildLenght; //Détermination de l'aire de jeu (X)
-const int colsMax = GrildLenght; //Détermination de l'aire de jeu (Y)
-
-/*CONSTANTES - PERSONALISATION D'INTERFACE*/
-const char gameConversion[GrildLenght]={'a','b','c','d','e','f','g','h','i','j'};
-const char gameConversionMaj[GrildLenght]={'A','B','C','D','E','F','G','H','I','J'};
-const char gameGrildPlouf[] = {" ○ "};
-const char gameGrildTouche[] = {" ! "};
-const char gameGrildCoule[] = {" × "};
-const char gameGrildVertical[] = {"|"};
-const char gameGrildHorizontal[]= {"_"};
-const char gameGrildHorizontalMiddle[]= {"─"};
-const char gameGrildCoinHautGauche[] = {"■"};
-const char gameGrildCoinHautDroite[] = {"■"};
-const char gameGrildCoinBasGauche[] = {"└"};
-const char gameGrildCoinBasDroite[]  = {"┘"};
-
-/*VARIABLES - PLATEAU DU JOUEUR*/
-int gameGrildCoups = 0; //Nombre de coups joués
-int gameGrild[GrildLenght][GrildLenght]; //Grille affichée à l'écran
-
-/*VARIABLES - BEATEAUX (Cachée du joueur)*/
-const int gameGrildBoatsNb = 5; //Nombres de bateaux
-int gameGrildBoatsHit[5] = {0,0,0,0,0}; //Nombre de zones touchées par le joueur pour chaque bateaux
-int gameGrildBoatsLenght[5] = {5,4,3,3,2};//Nombre de zones maximales par bateaux (Calculé pendant l'initialisation de la partie)
-int gameGrildBoats[GrildLenght][GrildLenght];//La carte du niveau entier est ici (0 - eau, de 1 à 5 - un id de bateau)
+#include <dos.h>
+#include <conio.h>
+/*Bibliothèques du jeu*/
+#include "globalvarsinit.h" //Le isEditor et isAudio ont été déplacé ici
+#include "drawer.c"
+#include "soundsystem.c"
+#include "visualevents.c"
 
 /**
  * Description : Le lancement et la fermeture du programme est ici
@@ -76,6 +44,7 @@ void setup(){
     SetConsoleOutputCP(CP_UTF8); //Les accents sont maintenant supportés
     if(!isEditor){
         SetConsoleTitle("Bataille Navale"); //Peut provoquer des erreurs dans la version sur CLION en affichant le contenu dans la console (ceci est maintenant protégé)
+        system("mode con: cols=180 lines=50");
     }else{
         printf("ATTENTION !");
         Sleep(200);
@@ -117,8 +86,10 @@ void setup(){
  * Description : Affiche le menu et traîte le choix de l'utilisateur
  */
 void displayMainMenu(){
+    system("color 1B");
     logAction(2,"Affichage du menu");
     clear();
+    playASound(0);
     playASound(2);
     playASound(3);
 
@@ -211,7 +182,7 @@ void setScore(){
     if(isEditor){
         printf("----Scores---- \n");
     }else{
-        drawer(3,0);
+        drawer(4,0);
     }
 
     /*Récupération du pseudo*/
@@ -395,6 +366,8 @@ void displayScores(){
  * Description : Fonction s'executant au démarage d'une partie pour remettre des variables de précédantes parties à leur état initial.
  */
 void setupGame(){
+    playASound(0);
+    playASound(9);
     playASound(3);
     logAction(1,"Démarage d'une partie");
     gameGrildCoups = 0;//Le joueur n'a pas encore joué de coups
@@ -638,7 +611,6 @@ void touchBoat(int line,int col){
                     bateauxTouche++;
                 }
             }
-
             /*Actions en fontion du résultat du nombre de bateaux coulés*/
             if(bateauxTouche == gameGrildBoatsNb){//Si il y a autant de bateaux coulés que de bateaux max
                 /*le joueur a gagné*/
@@ -646,6 +618,8 @@ void touchBoat(int line,int col){
                 endGame();
             }else{
                 /*La partie continue*/
+                playASound(0);
+                playASound(9+bateauxTouche);
                 logAction(3,"Le joueur a coulé un bateau");
                 visualEvent(3);
                 displayGame();
@@ -671,10 +645,13 @@ void touchBoat(int line,int col){
 void endGame(){
     showGameGrild();
     visualEvent(4);
-    printf("PARTIE TERMINEE EN %d COUPS ! \n",gameGrildCoups);
+    system("color df");
+    drawer(6,0);
+    printf("\nPARTIE TERMINEE EN %d COUPS ! \n",gameGrildCoups);
     logAction(3,"FIN DE PARTIE !");
     system("pause");
-
+    playASound(8);
+    system("color ed");
     clear();
     setScore();
     displayScores();
@@ -837,182 +814,4 @@ int askChoiceChar(){
         charConverted = askChoiceChar();
     }
     return charConverted;
-}
-
-/* ---- FONCTIONS DE STYLE ET D'EVENEMENT ----*/
-/**
- * Description : Fonction permettant de gérer différents évènement du jeu (Axé sur le front end)
- * @param event
- */
-void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->coulé, 4->Fin de partie)
-    switch (event){
-        case 0://Animation de lancement
-            if(!isEditor){
-                clear();//Bataille Navale
-                playASound(1);
-                system("color F0");
-                drawer(1,0);
-                Sleep(250);
-                system("color 04");
-                Sleep(2250);
-
-                clear();//Par Eliott
-                system("color F0");
-                drawer(3,0);
-                Sleep(250);
-                system("color 04");
-                Sleep(2250);
-
-                clear();//Animation de chargement
-                system("color 3E");
-                for(int i=0;i<50;i++){
-                    clear();
-                    drawer(0,i);
-                    Sleep(20);
-                }
-                system("color 1B");
-                playASound(0);
-            }else{
-                printf("Chargement... (version interne seulement - changer la constante isEditor en 1 pour le mode console)");
-                Sleep(2000);
-            }
-            break;
-        case 1://Plouf
-            if(isEditor){
-                printf("Plouf !\n");
-                Sleep(1000);
-            }else{
-                //Evenement visuel ici
-            }
-            break;
-        case 2://Touché
-            if(isEditor){
-                printf("Touché !\n");
-                Sleep(1000);
-            }else{
-                //Evenement visuel ici
-            }
-            break;
-        case 3://Coulé
-            if(isEditor){
-                printf("Coulé !\n");
-                Sleep(1000);
-            }else{
-                //Evenement visuel ici
-            }
-            break;
-        case 4://Fin de partie
-            if(isEditor){
-                printf("\nFin de la partie !");
-                Sleep(1000);
-            }else{
-                //Evenement visuel ici
-            }
-            break;
-        default:
-            Sleep(1000);
-            break;
-    }
-}
-/**
- *  Description : Fonction facilitant la gestion des sons
- * @param id : L'id du son
- */
-void playASound(int id){
-    if(isAudio && !isEditor){
-        switch(id){
-            case 1:
-                system("start /min %cd%/sounds/sounder.exe /id start /stopbyid %cd%/sounds/CLIP0_START.wav");
-                break;
-            case 2:
-                system("start /min %cd%/sounds/sounder.exe /id 4dist /loop 100 /stopbyid %cd%/sounds/CLIP4_DIST.wav");
-                break;
-            case 3:
-                system("start /min %cd%/sounds/sounder.exe /id click /stopbyid %cd%/sounds/s7.wav");
-                break;
-            case 0:
-            default:
-                system("start /min %cd%/sounds/sounder.exe /stop");
-                break;
-        }
-    }
-}
-/**
- * Description : Fonction de dessin d'image en ASCII
- * @param type : type dîmage à afficher
- * @param espace : nombres d'espaces depuis le début de la console (gauche)
- */
-void drawer(int type,int espace){
-    if(type == 0) {
-        printf("%*c                     -=#=-                          \n", espace, 32);
-        printf("%*c                     -####:                         \n", espace, 32);
-        printf("%*c                     -#####*                        \n", espace, 32);
-        printf("%*c                     -######=-                      \n", espace, 32);
-        printf("%*c                     -########:                     \n", espace, 32);
-        printf("%*c                   -*-#########+                    \n", espace, 32);
-        printf("%*c                   ==-##########=                   \n", espace, 32);
-        printf("%*c                  *#=-=##########=-                 \n", espace, 32);
-        printf("%*c                 +##=-############=                 \n", espace, 32);
-        printf("%*c                :###=-=############=                \n", espace, 32);
-        printf("%*c            -=:-####=-=#############=               \n", espace, 32);
-        printf("%*c           *#+-==###=-=##############=              \n", espace, 32);
-        printf("%*c         +##= *##==#=-=###############*             \n", espace, 32);
-        printf("%*c       -=##=-*#####==-=################*            \n", espace, 32);
-        printf("%*c      *####::#######=-=#################+           \n", espace, 32);
-        printf("%*c    :#####+-########=-===################+          \n", espace, 32);
-        printf("%*c   =#####=-=########= =###################:         \n", espace, 32);
-        printf("%*c          -+::---      --:::+**===#########:        \n", espace, 32);
-        printf("%*c:::::---------:**:-    ---:++**==****+:             \n", espace, 32);
-        printf("%*c:======================================*++:         \n", espace, 32);
-        printf("%*c  -*===================================***-         \n", espace, 32);
-        printf("%*c     :==============================*=***           \n", espace, 32);
-        printf("%*c       :=========================***==              \n", espace, 32);
-
-        printf("   ___  _                                                       _    \n");
-        printf("  / __|| |__    __ _  _ __  __ _   ___  _ __ ___    ___  _ __  | |_  \n");
-        printf(" / /   | '_ |  / _` || '__|/ _` | / _ || '_ ` _ |  / _ || '_ | | __| \n");
-        printf("/ /___ | | | || (_| || |  | (_| ||  __/| | | | | ||  __/| | | || |_  \n");
-        printf("|____/ |_| |_| |__,_||_|   |__, |||___||_| |_| |_| |___||_| |_| |__| ");
-        for (int i = 0; i < espace % 6; i++) {
-            printf("○");
-        }
-        printf("\n");
-        printf("                           |___/                                     ");
-    }else if(type == 1){
-        printf("%*c /$$$$$$$              /$$               /$$ /$$ /$$              /$$   /$$                               /$$          \n", espace, 32);
-        printf("%*c| $$__  $$            | $$              |__/| $$| $$             | $$$ | $$                              | $$          \n", espace, 32);
-        printf("%*c| $$  | $$  /$$$$$$  /$$$$$$    /$$$$$$  /$$| $$| $$  /$$$$$$    | $$$$| $$  /$$$$$$  /$$    /$$ /$$$$$$ | $$  /$$$$$$ \n", espace, 32);
-        printf("%*c| $$$$$$$  |____  $$|_  $$_/   |____  $$| $$| $$| $$ /$$__  $$   | $$ $$ $$ |____  $$|  $$  /$$/|____  $$| $$ /$$__  $$\n", espace, 32);
-        printf("%*c| $$__  $$  /$$$$$$$  | $$      /$$$$$$$| $$| $$| $$| $$$$$$$$   | $$  $$$$  /$$$$$$$ |  $$/$$/  /$$$$$$$| $$| $$$$$$$$\n", espace, 32);
-        printf("%*c| $$  | $$ /$$__  $$  | $$ /$$ /$$__  $$| $$| $$| $$| $$_____/   | $$|  $$$ /$$__  $$  |  $$$/  /$$__  $$| $$| $$_____/\n", espace, 32);
-        printf("%*c| $$$$$$$/|  $$$$$$$  |  $$$$/|  $$$$$$$| $$| $$| $$|  $$$$$$$   | $$ |  $$|  $$$$$$$   |  $/  |  $$$$$$$| $$|  $$$$$$$\n", espace, 32);
-        printf("%*c|_______/  |_______/   |___/   |_______/|__/|__/|__/ |_______/   |__/  |__/ |_______/    |_/    |_______/|__/ |_______/\n", espace, 32);
-    }else if(type == 2){
-        printf("%*c  /$$$$$$  /$$       /$$          \n", espace, 32);
-        printf("%*c /$$__  $$|__/      | $$          \n", espace, 32);
-        printf("%*c| $$  | $$ /$$  /$$$$$$$  /$$$$$$ \n", espace, 32);
-        printf("%*c| $$$$$$$$| $$ /$$__  $$ /$$__  $$\n", espace, 32);
-        printf("%*c| $$__  $$| $$| $$  | $$| $$$$$$$$\n", espace, 32);
-        printf("%*c| $$  | $$| $$| $$  | $$| $$_____/\n", espace, 32);
-        printf("%*c| $$  | $$| $$|  $$$$$$$|  $$$$$$$\n", espace, 32);
-        printf("%*c|__/  |__/|__/ |_______/ |_______/\n", espace, 32);
-    }else if(type == 3){
-        printf("%*c /$$$$$$$                                     /$$ /$$             /$$     /$$    \n", espace, 32);
-        printf("%*c| $$__  $$                                   | $$|__/            | $$    | $$    \n", espace, 32);
-        printf("%*c| $$  | $$ /$$$$$$   /$$$$$$         /$$$$$$ | $$ /$$  /$$$$$$  /$$$$$$ /$$$$$$  \n", espace, 32);
-        printf("%*c| $$$$$$$/|____  $$ /$$__  $$       /$$__  $$| $$| $$ /$$__  $$|_  $$_/|_  $$_/  \n", espace, 32);
-        printf("%*c| $$____/  /$$$$$$$| $$  |__/      | $$$$$$$$| $$| $$| $$  | $$  | $$    | $$    \n", espace, 32);
-        printf("%*c| $$      /$$__  $$| $$            | $$_____/| $$| $$| $$  | $$  | $$ /$$| $$ /$$\n", espace, 32);
-        printf("%*c| $$     |  $$$$$$$| $$            |  $$$$$$$| $$| $$|  $$$$$$/  |  $$$$/|  $$$$/\n", espace, 32);
-        printf("%*c|__/      |_______/|__/             |_______/|__/|__/ |______/    |___/   |___/  \n", espace, 32);
-    }else if(type == 4){
-        printf("%*c  /$$$$$$                                                   \n", espace, 32);
-        printf("%*c /$$__  $$                                                  \n", espace, 32);
-        printf("%*c| $$  |__/  /$$$$$$$  /$$$$$$   /$$$$$$   /$$$$$$   /$$$$$$$\n", espace, 32);
-        printf("%*c|  $$$$$$  /$$_____/ /$$__  $$ /$$__  $$ /$$__  $$ /$$_____/\n", espace, 32);
-        printf("%*c |____  $$| $$      | $$  | $$| $$  |__/| $$$$$$$$|  $$$$$$ \n", espace, 32);
-        printf("%*c /$$  | $$| $$      | $$  | $$| $$      | $$_____/ |____  $$\n", espace, 32);
-        printf("%*c|  $$$$$$/|  $$$$$$$|  $$$$$$/| $$      |  $$$$$$$ /$$$$$$$/\n", espace, 32);
-        printf("%*c |______/  |_______/ |______/ |__/       |_______/|_______/ \n", espace, 32);
-    }
 }
