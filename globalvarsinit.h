@@ -1,3 +1,10 @@
+/*
+ * Projet : Bataille Navale
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Auteur : Eliott Jaquier
+ * Ce script sert à initialiser les variables (globales) et tout ce qui doit se passer avant le lancement du main.c
+*/
+
 /*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
 #define MaxScoresDispalyed 100 //Le nombre maximum de scores affichés
 #define GrildLenght 10 //La longueur de la grille de jeu (carrée)
@@ -6,6 +13,8 @@
 /*CONSTANTES DE JEU*/
 const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 int isAudio = 1; //Activer ou désactiver l'audio
+int isEffect = 1; //Activer ou désactiver les effets visuels
+int isRapideLaunch= 1; //Activer ou désactiver la lancement rapide du jeu
 const int enablePrintLogsInConsole = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 const int linesMax = GrildLenght; //Détermination de l'aire de jeu (X)
 const int colsMax = GrildLenght; //Détermination de l'aire de jeu (Y)
@@ -39,5 +48,5 @@ int gameGrildBoats[GrildLenght][GrildLenght];//La carte du niveau entier est ici
 
 
 /*Génériques de fonctions*/
-void displayMainMenu(), setup(),setupGame(),displayHelp(),clear(),logAction(int typeEvent,char * texte),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),playASound(int id);
+void displayMainMenu(), setup(),setupGame(),displayHelp(),displayParameters(),renewParameters(),clear(),logAction(int typeEvent,char * texte),showGameGrild(),getRandomGame(),displayGame(),displayScores(),touchBoat(int line,int col),visualEvent(int event),endGame(),setScore(),playASound(int id);
 int askChoiceMin(int min,int max),askChoiceChar();

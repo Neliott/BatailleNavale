@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.4.1 - Pixelated Boat Style Version (Mise en place des couleurs et des sons)
- * Date : 27.03.2020
+ * Version : 1.4.1 - Pixelated Boat Style Version (Ajout des paramètres)
+ * Date : 30.03.2020
 */
 /*Bibliothèques par défaut*/
 #include <stdio.h>
@@ -42,18 +42,21 @@ int main() {
 void setup(){
     logAction(1,"Lancement du jeu");
     SetConsoleOutputCP(CP_UTF8); //Les accents sont maintenant supportés
+    renewParameters();
     if(!isEditor){
         SetConsoleTitle("Bataille Navale"); //Peut provoquer des erreurs dans la version sur CLION en affichant le contenu dans la console (ceci est maintenant protégé)
         system("mode con: cols=180 lines=50");
     }else{
-        printf("ATTENTION !");
-        Sleep(200);
-        printf(" VERSION CLION - EDITEUR ONLY !");
-        Sleep(200);
-        printf(" NE PAS EXECUTER EN DEHORS DU MODE INTEGRE de CLION! ");
-        Sleep(200);
-        printf("(Changer la constante isEditor)\n");
-        Sleep(500);
+        if(!isRapideLaunch){
+            printf("ATTENTION !");
+            Sleep(200);
+            printf(" VERSION CLION - EDITEUR ONLY !");
+            Sleep(200);
+            printf(" NE PAS EXECUTER EN DEHORS DU MODE INTEGRE de CLION! ");
+            Sleep(200);
+            printf("(Changer la constante isEditor)\n");
+            Sleep(500);
+        }
     }
     /*Création des dossiers requis pour commencer le jeu*/
     logAction(1,"Création des dossiers requis au démarage");
@@ -64,22 +67,28 @@ void setup(){
         isAudio = 0;
         logAction(1,"Aucun audio detecté.");
         if(!isEditor){//Si l'utilisateur n'a pas de sons et qu'il est en mode console,
-            printf("Bienvenue sur la bataille navale ! Dans l'état actuel, vous pouvez lancer l'application mais vous ne pourrez pas profiter de tous ces avantages ! Si vous désirez avoir une expérience optimale, veuillez ajouter le dossier 'sounds' avec tout son contenu pris depuis github. \n");
-            printf("SI VOUS AVEZ AJOUTE LE DOSSIER ET QUE VOUS REVOYEZ CETTE FENETRE, CONTACTEZ LE DEVELOPPEUR. (Ou changez l'état par défaut de la variable isAudio à 1 dans le fichier main.c)\n");
-            printf("Que voulez-vous faire ?\n");
-            printf("1. Je veux jouer sans les sonds (expérience non-optimale)\n");
-            printf("2. Ouvrir le github du projet et fermer l'application\n");
-            int choixOpener = askChoiceMin(1,2);
-            if(choixOpener == 2){//Si l'utilisateur désire avoir accès au github pour prendre le dossier des sonds.
-                system("explorer https://github.com/EliottJaquierCPNV/BatailleNavale");
-                logAction(0,"Le joueur a voulu quitter l'application et aller sur github pour télecharger les sons du projet.");
-                exit(1);
+            if(!isRapideLaunch) {
+                printf("Bienvenue sur la bataille navale ! Dans l'état actuel, vous pouvez lancer l'application mais vous ne pourrez pas profiter de tous ces avantages ! Si vous désirez avoir une expérience optimale, veuillez ajouter le dossier 'sounds' avec tout son contenu pris depuis github. \n");
+                printf("SI VOUS AVEZ AJOUTE LE DOSSIER ET QUE VOUS REVOYEZ CETTE FENETRE, CONTACTEZ LE DEVELOPPEUR. (Ou changez l'état par défaut de la variable isAudio à 1 dans le fichier main.c)\n");
+                printf("Que voulez-vous faire ?\n");
+                printf("1. Je veux jouer sans les sonds (expérience non-optimale)\n");
+                printf("2. Ouvrir le github du projet et fermer l'application\n");
+                int choixOpener = askChoiceMin(1, 2);
+                if (choixOpener == 2) {//Si l'utilisateur désire avoir accès au github pour prendre le dossier des sonds.
+                    system("explorer https://github.com/EliottJaquierCPNV/BatailleNavale");
+                    logAction(0,"Le joueur a voulu quitter l'application et aller sur GitHub pour télecharger les sons du projet.");
+                    exit(1);
+                }
             }
         }
+    }else{
+        playASound(0);
     }
     printf("\n");
     clear();
-    visualEvent(0);
+    if(!isRapideLaunch) {
+        visualEvent(0);
+    }
 }
 
 /**
@@ -107,13 +116,14 @@ void displayMainMenu(){
     printf("(2) - Aide \n");
     printf("(3) - Scores\n");
     printf("(4) - Où nous trouver \n");
-    printf("(5) - Quitter \n");
+    printf("(5) - Paramètres \n");
+    printf("(6) - Quitter \n");
     printf(" \n");
 
     printf("Veuillez choisir une option : \n");
 
     /*Traîtement du choix*/
-    switch (askChoiceMin(1,5)){
+    switch (askChoiceMin(1,6)){
         case 1:
             setupGame();
             break;
@@ -128,14 +138,14 @@ void displayMainMenu(){
             displayMainMenu();
             break;
         case 5:
+            displayParameters();
+            displayMainMenu();
+            break;
+        case 6:
             playASound(0);
             logAction(1,"Fin du jeu sans erreur");
             printf("Fermeture...\n");
             break;
-        /*case 6:
-            setScore();
-            displayMainMenu();
-            break;*/
         default:
             printf("Ceci n'est pas une option valide !\n");
             displayMainMenu();
@@ -170,6 +180,122 @@ void displayHelp(){
 
     system("pause");
     displayMainMenu();
+}
+/**
+ * Description : affiche les paramètres au joueur
+ */
+void displayParameters(){
+    playASound(3);
+    logAction(2,"Affichage des paramètres");
+    clear();
+
+    /*Affichage de l'entête*/
+    if(isEditor){
+        printf("----Paramètres---- \n");
+    }else{
+        drawer(7,0);
+    }
+
+    /*Lecture et récupération des variables de paramètres*/
+    FILE *fichier;
+    fichier = NULL;
+    fichier = fopen("config.ini", "r+");
+
+    int params[3] = {0};
+    if (fichier != NULL)
+    {
+        fscanf(fichier, "%d %d %d", &params[0], &params[1], &params[2]);
+        fclose(fichier);
+    }
+    else
+    {
+        fclose(fichier);
+        params[0] = 0;
+        params[1] = 1;
+        params[2] = 1;
+    }
+
+    /*Affichage des options (selon les informations récupérée précédemment*/
+    printf("  \n");
+    printf("Séléctionnez l'option à activer/désactiver\n");
+    if(params[0]){
+        printf("1. Démarage rapide (désactiver la cinématique et tous les messages de prévention) - (OK)\n");
+    }else{
+        printf("1. Démarage rapide (désactiver la cinématique et tous les messages de prévention) - (Désactivé)\n");
+    }
+    if(params[1]) {
+        printf("2. Audio - (OK)\n");
+    }else{
+        printf("2. Audio - (Désactivé)\n");
+    }
+    if(params[2]) {
+        printf("3. Effets - (OK)\n");
+    }else{
+        printf("3. Effets - (Désactivés)\n");
+    }
+
+
+    printf("\nTapez 4 pour revenir au menu.\n");
+
+    int choice =askChoiceMin(1,4);
+
+    switch (choice){
+        FILE *fichier;
+        case 1:
+        case 2:
+        case 3:
+            /*Changement d'états (stockés dans un fichier externe)*/
+            fichier = NULL;
+            fichier = fopen("config.ini", "w");
+            if(params[choice-1]){
+                params[choice-1] = 0;
+            }else{
+                params[choice-1] = 1;
+            }
+            fprintf(fichier, "%d %d %d",params[0], params[1], params[2]);
+            fclose(fichier);
+
+            renewParameters();
+            displayParameters();
+            break;
+        case 4:
+        default:
+            break;
+    }
+}
+/**
+ * Descirption : Rafraichi les derniers paramètres et les appliquent (A partir du fichier)
+ */
+void renewParameters(){
+    FILE *fichier;
+    fichier = NULL;
+    fichier = fopen("config.ini", "r+");
+    int params[3] = {0};
+
+    if (fichier != NULL)
+    {
+        fscanf(fichier, "%d %d %d", &params[0], &params[1], &params[2]);
+        fclose(fichier);
+    }
+    else
+    {
+        fclose(fichier);
+        params[0] = 0;
+        params[1] = 1;
+        params[2] = 1;
+    }
+    DIR* dir = opendir("sounds");
+    isAudio = params[1];
+    if (!dir) {
+        isAudio = 0;
+    } else {
+        if(!isAudio){
+            system("start /min %cd%/sounds/sounder.exe /stop");
+        }
+    }
+    closedir(dir);
+    isEffect = params[2];
+    isRapideLaunch = params[0];
 }
 /**
  * Description : Une fonction qui stocke le dernier score fait par le joueur dans un fichier
@@ -561,6 +687,7 @@ void displayGame(){
 
     do {
         logAction(3,"Le joueur entre une position...");
+        printf("Entrez la colone à attaquer :");
         colAttack = askChoiceChar(); //Le scanf seulement n'étant pas suffisant pour cette requête, une fonction spéciale de traîtement a été créée (Demande à l'utilisateur et transforme son choix en une valeur INT utilisable pour tableau)
         /*Remise au même état que si la précédante commande n'avait pas existé (Plus jolis et prends moins de place)*/
         showGameGrild();

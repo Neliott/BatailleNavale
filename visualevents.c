@@ -1,3 +1,9 @@
+/*
+ * Projet : Bataille Navale
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Auteur : Eliott Jaquier
+ * Ce script sert à gérer des évènements spéciaux du jeu nécésitant une réaction graphique
+*/
 /**
  * Description : Fonction permettant de gérer différents évènement du jeu (Axé sur le front end)
  * @param event : L'id de l'évènement de partie
@@ -36,7 +42,7 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             }
             break;
         case 1://Plouf
-            if(isEditor){
+            if(isEditor|| !isEffect){
                 printf("Plouf !\n");
                 Sleep(1000);
             }else{
@@ -48,7 +54,7 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             }
             break;
         case 2://Touché
-            if(isEditor){
+            if(isEditor || !isEffect){
                 printf("Touché !\n");
                 Sleep(1000);
             }else{
@@ -59,7 +65,7 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             }
             break;
         case 3://Coulé
-            if(isEditor){
+            if(isEditor || !isEffect){
                 printf("Coulé !\n");
                 Sleep(1000);
             }else{
@@ -87,35 +93,37 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
             }else{
                 //Evenement visuel ici
                 playASound(0);
-                playASound(7);
-                playASound(6);
-                for(int i=0;i<25;i++) {
-                    if(i==7){
-                        clear();
-                        drawer(6,0);
+                if(isEffect){
+                    playASound(7);
+                    playASound(6);
+                    for(int i=0;i<25;i++) {
+                        if(i==7){
+                            clear();
+                            drawer(6,0);
+                        }
+                        if(i==14){
+                            clear();
+                            drawer(1,0);
+                            printf("\n");
+                            drawer(5,0);
+                        }
+                        if(i==20){
+                            clear();
+                            drawer(3,0);
+                        }
+                        system("color 4F");
+                        Sleep(100);
+                        system("color 6F");
+                        Sleep(100);
+                        system("color 2F");
+                        Sleep(100);
+                        system("color 1F");
+                        Sleep(100);
+                        system("color 9F");
+                        Sleep(100);
+                        system("color 5F");
+                        Sleep(100);
                     }
-                    if(i==14){
-                        clear();
-                        drawer(1,0);
-                        printf("\n");
-                        drawer(5,0);
-                    }
-                    if(i==20){
-                        clear();
-                        drawer(3,0);
-                    }
-                    system("color 4F");
-                    Sleep(100);
-                    system("color 6F");
-                    Sleep(100);
-                    system("color 2F");
-                    Sleep(100);
-                    system("color 1F");
-                    Sleep(100);
-                    system("color 9F");
-                    Sleep(100);
-                    system("color 5F");
-                    Sleep(100);
                 }
                 system("color 1B");
                 clear();

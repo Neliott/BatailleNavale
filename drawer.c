@@ -1,3 +1,9 @@
+/*
+ * Projet : Bataille Navale
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Auteur : Eliott Jaquier
+ * Ce script sert à afficher des 'images' définie dans la console.
+*/
 /**
  * Description : Fonction de dessin d'image en ASCII
  * @param type : type dîmage à afficher
@@ -6,13 +12,13 @@
 void drawer(int type,int espace){
     switch(type){
         case 0:
-            drawer(5,espace);
+            drawer(5,espace);//Déssine le bateau
             printf("   ___  _                                                       _    \n");
             printf("  / __|| |__    __ _  _ __  __ _   ___  _ __ ___    ___  _ __  | |_  \n");
             printf(" / /   | '_ |  / _` || '__|/ _` | / _ || '_ ` _ |  / _ || '_ | | __| \n");
             printf("/ /___ | | | || (_| || |  | (_| ||  __/| | | | | ||  __/| | | || |_  \n");
             printf("|____/ |_| |_| |__,_||_|   |__, |||___||_| |_| |_| |___||_| |_| |__| ");
-            for (int i = 0; i < espace % 6; i++) {
+            for (int i = 0; i < espace % 6; i++) {//Met les points de chargement
                 printf("○");
             }
             printf("\n");
@@ -93,6 +99,16 @@ void drawer(int type,int espace){
             printf("%*c| $$  | $$| $$      /$$__  $$  |  $$$/ | $$  | $$          \n", espace, 32);
             printf("%*c| $$$$$$$/| $$     |  $$$$$$$   |  $/  |  $$$$$$/       /$$\n", espace, 32);
             printf("%*c|_______/ |__/      |_______/    |_/    |______/       |__/\n", espace, 32);
+            break;
+        case 7:
+            printf("%*c /$$$$$$$                                                        /$$                                  \n", espace, 32);
+            printf("%*c| $$__  $$                                                      | $$                                  \n", espace, 32);
+            printf("%*c| $$  | $$ /$$$$$$   /$$$$$$  /$$$$$$  /$$$$$$/$$$$   /$$$$$$  /$$$$$$    /$$$$$$   /$$$$$$   /$$$$$$$\n", espace, 32);
+            printf("%*c| $$$$$$$/|____  $$ /$$__  $$|____  $$| $$_  $$_  $$ /$$__  $$|_  $$_/   /$$__  $$ /$$__  $$ /$$_____/\n", espace, 32);
+            printf("%*c| $$____/  /$$$$$$$| $$  |__/ /$$$$$$$| $$ | $$ | $$| $$$$$$$$  | $$    | $$  |__/| $$$$$$$$|  $$$$$$ \n", espace, 32);
+            printf("%*c| $$      /$$__  $$| $$      /$$__  $$| $$ | $$ | $$| $$_____/  | $$ /$$| $$      | $$_____/ |____  $$\n", espace, 32);
+            printf("%*c| $$     |  $$$$$$$| $$     |  $$$$$$$| $$ | $$ | $$|  $$$$$$$  |  $$$$/| $$      |  $$$$$$$ /$$$$$$$/\n", espace, 32);
+            printf("%*c|__/      |_______/|__/      |_______/|__/ |__/ |__/ |_______/   |___/  |__/       |_______/|_______/ \n", espace, 32);
             break;
         default:
             break;
