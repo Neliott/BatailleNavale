@@ -2,8 +2,8 @@
  * Projet : Bataille Navale
  * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.4.1 - Pixelated Boat Style Version (Ajout des paramètres)
- * Date : 30.03.2020
+ * Version : 1.4.1 - Pixelated Boat Style Version (Ajout d'un animal vertébré aquatique à branchies)
+ * Date : 1.04.2020
 */
 /*Bibliothèques par défaut*/
 #include <stdio.h>

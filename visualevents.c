@@ -9,8 +9,81 @@
  * @param event : L'id de l'évènement de partie
  */
 void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->coulé, 4->Fin de partie)
+    time_t t = time(NULL); //https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program
+    struct tm tm = *localtime(&t);//Prise de l'instance de l'heure locale dans une structure
     switch (event){
         case 0://Animation de lancement
+
+            /*Récupération de la date*/
+            if((tm.tm_mday < 3) && ( tm.tm_mon + 1) == 4){//Déclenchement d'un poisson d'avril
+                printf("Projet corrompu !\n");
+                Sleep(1000);
+                printf("Récupération automatique.");
+                Sleep(1000);
+                printf(".");
+                Sleep(1000);
+                printf(".");
+                Sleep(1000);
+                printf(".\n");
+                printf("La récupération a échouée !!!\n");
+                Sleep(2000);
+                printf("Essayez de redémarer le jeu...\n");
+                Sleep(3500);
+                clear();
+                Sleep(1000);
+                playASound(14);
+                if(!isEditor) {
+                    system("color 91");
+                }
+                drawer(8,0);
+                printf("\n Poisson d'avril !!!");
+                for(int i = 0;i<10;i++){
+                    system("color 4F");
+                    Sleep(100);
+                    system("color 6F");
+                    Sleep(100);
+                    system("color 2F");
+                    Sleep(100);
+                    system("color 1F");
+                    Sleep(100);
+                    system("color 9F");
+                    Sleep(100);
+                    system("color 5F");
+                    Sleep(100);
+                }
+                Sleep(1000);
+                clear();
+                if(!isEditor) {
+                    system("color F");
+                }
+
+                int choice = 1;
+                do{
+                    if(choice != 1){
+                        Sleep(1000);
+                        printf("");
+                    }
+                    printf("Avez-vous apprécié ce GAG ? \n 1. Oui \n 2. Non\n");
+                    scanf("%d",&choice);
+                    clear();
+                    if(choice != 1){
+                        Sleep(1000);
+                        printf("Ok, je pense que vous avez mal compris la question...");
+                        Sleep(3000);
+                    }
+                }while(choice != 1);
+                clear();
+                Sleep(1000);
+                printf("Ahahahah ! Ouiiii ! J'en était sûre ! Tout le monde me dis ça !!!\n");
+                Sleep(5000);
+                printf("C'est vraiment un GAG super drôle non ?!\n");
+                Sleep(1500);
+                printf("Bon. Je vais vous laisser profiter du jeu maintenant !\n");
+                Sleep(1000);
+                printf("Bonne chance ! !\n");
+                Sleep(6000);
+                clear();
+            }
             if(!isEditor){
                 clear();//Bataille Navale
                 playASound(1);

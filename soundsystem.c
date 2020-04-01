@@ -50,6 +50,9 @@ void playASound(int id){
             case 13: //Loop jeu5
                 system("start /min %cd%/sounds/sounder.exe /id jeu5 /loop 100 /stopbyid %cd%/sounds/CLIP3.wav");
                 break;
+            case 14: //Loop prank
+                system("start /min %cd%/sounds/sounder.exe /id prank /stopbyid %cd%/sounds/m.wav");
+                break;
             case 0:
             default:
                 system("start /min %cd%/sounds/sounder.exe /stop");
