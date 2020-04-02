@@ -9,13 +9,11 @@ Une projet d'entrainement en C afin de s’entraîner à exécuter des mandats, 
  3. Ouvrez le répertoire depuis l'éditeur 
  4. Compilez le (cela va indiquer où le .exe sera compilé)
  
-      4.1 - Si vous décidez d'avoir une version optimisée pour CLION, ne changez rien et lancez l'application directement depuis l'éditeur.
+      4.1 - Si vous décidez d'avoir une version optimisée pour la console intégrée CLION, ne changez rien et lancez l'application directement depuis l'éditeur.
  
-      4.2 - Si vous desirez avoir accès à toutes les fonctionnalités en bêta (couleur, animation ou encore des sonds), lancez le .exe en externe. Si vous faites cela veuillez régler la constante du jeu "isEditor" sur 0. Il est également conseillé de mettre le répertoire des sounds se trouvant dans le "Fichiers tests (A côté du .exe)" à côté du .exe pour profiter des sons.
+      4.2 - Si vous desirez avoir accès à TOUTES les fonctionnalités (couleurs, animations ou des sonds), lancez le .exe en externe. Si vous faites cela, veuillez régler la constante du jeu "isEditor" sur 0. IL EST VIVEMENT CONSEILLE DE PRENDRE "Fichiers tests (A côté du .exe)" ET DE DEPLACER TOUS LES REPERTOIRES A COTE DU .EXE
  
- 5. La dernière étape est de créer une carte comme les modèles de tests se trouvant ci-dessous. Si vous ne voyez pas le dossier "maps" à côté du jeu, veuillez le créer ou lancer et quitter le jeu une fois pour l'initialiser.
- 
- 6. Appréciez ces graphismes de l'extrême du mode console en jouant à la bataille navale !
+ 5. Appréciez ces graphismes de l'extrême du mode console en jouant à la bataille navale !
 
 **Comment bien créer une carte**
 (Un exemple est dans le dossier des "Fichiers de tests à déplacer")
