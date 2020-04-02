@@ -1,3 +1,6 @@
+/Programme/.idea/
+/Programme/cmake-build-debug/
+/Programme/cmake-build-default/
 /.idea/
 /cmake-build-debug/
 /cmake-build-default/
