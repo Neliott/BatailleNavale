@@ -16,7 +16,7 @@ Une projet d'entrainement en C afin de s’entraîner à exécuter des mandats, 
  5. Appréciez ces graphismes de l'extrême du mode console en jouant à la bataille navale !
 
 **Comment bien créer une carte**
-(Un exemple est dans le dossier des "Fichiers de tests à déplacer")
+(Un exemple est dans le dossier "maps" des "Fichiers tests (A côté du .exe)")
 
 1. Laissez une ligne vide à la fin de votre carte de 10 par 10
 2. Les bateaux doivent avoir des ID différents allant de 1 à 5
