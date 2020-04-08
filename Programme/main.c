@@ -1,9 +1,9 @@
 /*
  * Projet : Bataille Navale
- * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-431 du CPNV
  * Auteur : Eliott Jaquier
- * Version : 1.4.1 - Pixelated Boat Style Version (Ajout d'un animal vertébré aquatique à branchies)
- * Date : 1.04.2020
+ * Version : 1.5.1 - Docstylend (Résuoltions de bugs mineurs)
+ * Date : 08.04.2020
 */
 /*Bibliothèques par défaut*/
 #include <stdio.h>
@@ -12,14 +12,13 @@
 #include "string.h" //Ajoute quelques fonctions utiles pour les tableaux de char
 #include <time.h> //Le système servant pour la date
 #include <dirent.h>
-#include <mmsystem.h>
+/*#include <mmsystem.h>
 #include <windowsx.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dos.h>
-#include <conio.h>
+#include <conio.h>*/
 /*Bibliothèques du jeu*/
 #include "globalvarsinit.h" //Le isEditor et isAudio ont été déplacé ici
 #include "drawer.c"
@@ -45,17 +44,17 @@ void setup(){
     renewParameters();
     if(!isEditor){
         SetConsoleTitle("Bataille Navale"); //Peut provoquer des erreurs dans la version sur CLION en affichant le contenu dans la console (ceci est maintenant protégé)
-        system("mode con: cols=180 lines=50");
+        system("mode con: cols=180 lines=50"); //Changement de la largeur et de la heuteur de la console
     }else{
-        if(!isRapideLaunch){
-            printf("ATTENTION !");
-            Sleep(200);
+        if(!isRapideLaunch){//Si le lancement rapide n'a pas été coché (par défaut dans les praramètres)
+            printf("ATTENTION !");//Affichage du message de prévention comme quoi, il est mieux d'executer l'application en mode condole et de changer la constante
+            Sleep(100);
             printf(" VERSION CLION - EDITEUR ONLY !");
             Sleep(200);
-            printf(" NE PAS EXECUTER EN DEHORS DU MODE INTEGRE de CLION! ");
-            Sleep(200);
-            printf("(Changer la constante isEditor)\n");
-            Sleep(500);
+            printf(" NE PAS EXECUTER EN DEHORS DU MODE CONSOLE INTEGRE de CLION! ");
+            Sleep(1000);
+            printf("(Changer la constante isEditor sur 0 et passez en mode console)\n");
+            Sleep(1000);
         }
     }
     /*Création des dossiers requis pour commencer le jeu*/
@@ -63,9 +62,9 @@ void setup(){
     mkdir("maps");
     mkdir("gameassets");
     DIR* dir = opendir("sounds");
-    if (!dir) {//L'utilisateur n'a pas de sons
+    if ((!dir)) {//L'utilisateur n'a pas de sons (le dossier)
         isAudio = 0;
-        logAction(1,"Aucun audio detecté.");
+        logAction(0,"Aucun audio detecté.");
         if(!isEditor){//Si l'utilisateur n'a pas de sons et qu'il est en mode console,
             if(!isRapideLaunch) {
                 printf("Bienvenue sur la bataille navale ! Dans l'état actuel, vous pouvez lancer l'application mais vous ne pourrez pas profiter de tous ces avantages ! Si vous désirez avoir une expérience optimale, veuillez ajouter le dossier 'sounds' avec tout son contenu pris depuis github. \n");
@@ -81,13 +80,27 @@ void setup(){
                 }
             }
         }
-    }else{
-        playASound(0);
+    }
+    /*L'ERREUR QUI SUIT NE DEVRAIT PLUS ARRIVER DEPUIS LE REMPLACEMENT du %CD% en .*/
+    if(isAudio == 1){
+        if(system("start /min ./sounds/sounder.exe /stop") == 1){ //Si une erreur de sounder.exe survient alors que le dossier a été trouvé, c'est que le chemin d'accès contient un espace (les commande CMD ne supportent pas ceci)
+            isAudio = 0;
+            logAction(0,"Aucun audio detecté.");
+            printf("Oops ! Le jeu ne peut pas s'executer si le chemin d'acces pour y aller contient un espace ! (Si vous continuez à avoir ce problème, contactez le développeur");
+            printf("Voulez-vous quand même continuer ?\n");
+            printf("1. Oui (Mais s'exposer à des erreurs)\n");
+            printf("2. Non (Changer le chemin d'accès jusqu'à l'executable)\n");
+            int choixOpener = askChoiceMin(1, 2);
+            if (choixOpener == 2) {//Le joueur décide de quitter l'application pour changer le chemin d'accès.
+                logAction(0,"Le joueur a voulu quitter l'application pour changer le chemin d'accès.");
+                exit(1);
+            }
+        }
     }
     printf("\n");
     clear();
     if(!isRapideLaunch) {
-        visualEvent(0);
+        visualEvent(0);//Execution de l'évènement visuel de démarage
     }
 }
 
@@ -95,7 +108,6 @@ void setup(){
  * Description : Affiche le menu et traîte le choix de l'utilisateur
  */
 void displayMainMenu(){
-    system("color 1B");
     logAction(2,"Affichage du menu");
     clear();
     playASound(0);
@@ -107,6 +119,7 @@ void displayMainMenu(){
         printf("----Menu---- \n");
     }else{
         drawer(1,0);
+        system("color 1B");//Fond bleu et texte bleu clair
     }
     printf("  \n");
 
@@ -199,17 +212,17 @@ void displayParameters(){
     /*Lecture et récupération des variables de paramètres*/
     FILE *fichier;
     fichier = NULL;
-    fichier = fopen("config.ini", "r+");
+    fichier = fopen("config.ini", "r+");//Récupération du fichier
 
     int params[3] = {0};
-    if (fichier != NULL)
+    if (fichier != NULL)//Si il existe
     {
-        fscanf(fichier, "%d %d %d", &params[0], &params[1], &params[2]);
+        fscanf(fichier, "%d %d %d", &params[0], &params[1], &params[2]);//Récupération des trois valeurs
         fclose(fichier);
     }
     else
     {
-        fclose(fichier);
+        fclose(fichier);//Ferme le fichier et prend les paramètres par défaut
         params[0] = 0;
         params[1] = 1;
         params[2] = 1;
@@ -234,26 +247,25 @@ void displayParameters(){
         printf("3. Effets - (Désactivés)\n");
     }
 
-
     printf("\nTapez 4 pour revenir au menu.\n");
 
     int choice =askChoiceMin(1,4);
 
     switch (choice){
-        FILE *fichier;
+        FILE *fichierWrite;
         case 1:
         case 2:
         case 3:
             /*Changement d'états (stockés dans un fichier externe)*/
-            fichier = NULL;
-            fichier = fopen("config.ini", "w");
-            if(params[choice-1]){
+            fichierWrite = NULL;
+            fichierWrite = fopen("config.ini", "w");//Ecriture seuelement (le fichier sera créé automatiquement s'il n'existe pas
+            if(params[choice-1]){//Inversion de l'état de la variable désirée
                 params[choice-1] = 0;
             }else{
                 params[choice-1] = 1;
             }
-            fprintf(fichier, "%d %d %d",params[0], params[1], params[2]);
-            fclose(fichier);
+            fprintf(fichierWrite, "%d %d %d",params[0], params[1], params[2]);//Ecriture des nouvelles variable dans le fichier
+            fclose(fichierWrite);
 
             renewParameters();
             displayParameters();
@@ -267,6 +279,7 @@ void displayParameters(){
  * Descirption : Rafraichi les derniers paramètres et les appliquent (A partir du fichier)
  */
 void renewParameters(){
+    /*Prise des valeurs depuis le fichier*/
     FILE *fichier;
     fichier = NULL;
     fichier = fopen("config.ini", "r+");
@@ -274,23 +287,23 @@ void renewParameters(){
 
     if (fichier != NULL)
     {
-        fscanf(fichier, "%d %d %d", &params[0], &params[1], &params[2]);
+        fscanf(fichier, "%d %d %d", &params[0], &params[1], &params[2]);//Récupération des 3 trois
         fclose(fichier);
     }
     else
     {
-        fclose(fichier);
+        fclose(fichier);//Ferme le fichier et prend les paramètres par défaut
         params[0] = 0;
         params[1] = 1;
         params[2] = 1;
     }
     DIR* dir = opendir("sounds");
     isAudio = params[1];
-    if (!dir) {
-        isAudio = 0;
+    if (!dir) {//Si le réperstoire n'existe pas
+        isAudio = 0; //L'audio doit forcément être désactivé
     } else {
         if(!isAudio){
-            system("start /min %cd%/sounds/sounder.exe /stop");
+            system("start /min ./sounds/sounder.exe /stop");//La valeur de l'audio est changée mais des musique peuvent encore être jouée (donc, dans le doute, on arrête toutes les musique)
         }
     }
     closedir(dir);
@@ -656,9 +669,9 @@ void getRandomGame(){
         }
         /*Recopie la structure du fichier pour la metttre dans le tableau*/
         for(int i = 0;i< GrildLenght;i++){
-            for(int placeColone = 0;placeColone < GrildLenght;placeColone++){
-                char ch = lines[i][placeColone];
-                gameGrildBoats[i][placeColone] = (int) strtol(&ch, NULL, 10);
+            for(int placecolonne = 0;placecolonne < GrildLenght;placecolonne++){
+                char ch = lines[i][placecolonne];
+                gameGrildBoats[i][placecolonne] = (int) strtol(&ch, NULL, 10);
             }
         }
         logAction(1,"Le tableau des bateaux a été traîté avec succès");
@@ -687,7 +700,7 @@ void displayGame(){
 
     do {
         logAction(3,"Le joueur entre une position...");
-        printf("Entrez la colone à attaquer :");
+        printf("Entrez la colonne à attaquer :");
         colAttack = askChoiceChar(); //Le scanf seulement n'étant pas suffisant pour cette requête, une fonction spéciale de traîtement a été créée (Demande à l'utilisateur et transforme son choix en une valeur INT utilisable pour tableau)
         /*Remise au même état que si la précédante commande n'avait pas existé (Plus jolis et prends moins de place)*/
         showGameGrild();
@@ -711,7 +724,7 @@ void displayGame(){
 /**
  * Description : Une fonction qui va traîter diverses sortes d'intéraction avec une case désignée.
  * @param line : La ligne cible du tir
- * @param col : La colone cible du tir
+ * @param col : La colonne cible du tir
  */
 void touchBoat(int line,int col){
     if(gameGrildBoats[line][col] != 0){ //Si un bateau est sur la case
@@ -770,15 +783,22 @@ void touchBoat(int line,int col){
  * Description : Fonction s'éxecutant à la fin d'une partie
  */
 void endGame(){
-    showGameGrild();
-    visualEvent(4);
-    system("color df");
-    drawer(6,0);
+    showGameGrild();//Affichage de tous les bateaux coulés
+    visualEvent(4);//Evènement de fin de partie
+    if(!isEditor){
+        system("color df");
+        drawer(6,0);//Affichage du Bravo en ASCII
+    }else{
+        clear();
+        printf("BRAVO !\n");
+    }
     printf("\nPARTIE TERMINEE EN %d COUPS ! \n",gameGrildCoups);
     logAction(3,"FIN DE PARTIE !");
     system("pause");
     playASound(8);
-    system("color ed");
+    if(!isEditor) {
+        system("color ed");
+    }
     clear();
     setScore();
     displayScores();
@@ -821,8 +841,8 @@ void showGameGrild(){
 
             }else{
 
-                for(int colsALineNow = 0;colsALineNow < colsMax;colsALineNow++){//Se répéte le nombre de colones qu'il y a dans les données
-                    printf("%s",gameGrildVertical);//Affichage d'un séparateur de colones
+                for(int colsALineNow = 0;colsALineNow < colsMax;colsALineNow++){//Se répéte le nombre de colonnes qu'il y a dans les données
+                    printf("%s",gameGrildVertical);//Affichage d'un séparateur de colonnes
                     for(int i = 0;i < 3;i++){
                         printf("%s",gameGrildHorizontal);//Affichage de caractères horizontaux afin de créer une ligne
                     }
@@ -833,7 +853,7 @@ void showGameGrild(){
 
         }else{
             printf("%2d ",(line/2)+1);
-            for (int col = 0; col < colsMax; col++) {//Se répéte le nombre de colones qu'il y a dans les données
+            for (int col = 0; col < colsMax; col++) {//Se répéte le nombre de colonnes qu'il y a dans les données
                 int celluleActuelle = gameGrild[line / 2][col];
                 switch (celluleActuelle){ //Détermine de quelle façon la cellule va être affichée (plouf,touché,coulé)
                     case 1:
@@ -865,7 +885,7 @@ void clear(){
     if(isEditor == 0){
         system("cls");
     }else{
-        for(int i=0;i<=5;i++){
+        for(int i=0;i<=5;i++){//une version optimisée pour clion (émuler un cls)
             printf("\n");
         }
     }
@@ -877,7 +897,7 @@ void clear(){
  * @param texte la descruption
  */
 void logAction(int typeEvent,char * texte){
-    char eventName[4][64] = {"FATAL ERROR","BOOT AND LOW-SYSTEMS","UI SYSTEM AND MANAGER","GAME EVENT"};
+    char eventName[4][64] = {"FATAL ERROR","BOOT AND LOW-SYSTEMS","UI SYSTEM AND MANAGER","GAME EVENT"};//Les type d'évènements
 
     //Récupération de la date actuelle
     time_t t = time(NULL); //https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program
@@ -890,7 +910,7 @@ void logAction(int typeEvent,char * texte){
     FILE* fichier = NULL;
 
     fichier = fopen("logs.txt", "a");
-    fprintf(fichier,"%d.%02d.%02d à %02d:%02d - %s : %s\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min,eventName[typeEvent],texte);
+    fprintf(fichier,"%d.%02d.%02d à %02d:%02d - %s : %s\n", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min,eventName[typeEvent],texte);//Mis e de la date, le type et la description de l'évènement
     fclose(fichier);
 }
 

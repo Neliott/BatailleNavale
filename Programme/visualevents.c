@@ -1,6 +1,6 @@
 /*
  * Projet : Bataille Navale
- * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-431 du CPNV
  * Auteur : Eliott Jaquier
  * Ce script sert à gérer des évènements spéciaux du jeu nécésitant une réaction graphique
 */
@@ -84,6 +84,8 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
                 Sleep(6000);
                 clear();
             }
+			
+			
             if(!isEditor){
                 clear();//Bataille Navale
                 playASound(1);
@@ -170,20 +172,21 @@ void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->co
                     playASound(7);
                     playASound(6);
                     for(int i=0;i<25;i++) {
-                        if(i==7){
+                        if(i==7){//Bravo
                             clear();
                             drawer(6,0);
                         }
-                        if(i==14){
+                        if(i==14){//Bataille Navale
                             clear();
                             drawer(1,0);
                             printf("\n");
                             drawer(5,0);
                         }
-                        if(i==20){
+                        if(i==20){//Par eliott
                             clear();
                             drawer(3,0);
                         }
+                        /*Arc en ciel*/
                         system("color 4F");
                         Sleep(100);
                         system("color 6F");

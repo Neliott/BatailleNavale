@@ -1,8 +1,8 @@
 /*
  * Projet : Bataille Navale
- * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-431 du CPNV
  * Auteur : Eliott Jaquier
- * Ce script sert à initialiser les variables (globales) et tout ce qui doit se passer avant le lancement du main.c
+ * Ce script sert à initialiser les variables (globales) et tout ce qui doit se placer avant le lancement du main.c
 */
 
 /*Définitions pré-build (Utile pour les tableaux) (Commencent avec une majuscule pour les différentier de variables)*/
@@ -14,7 +14,7 @@
 const int isEditor = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 int isAudio = 1; //Activer ou désactiver l'audio
 int isEffect = 1; //Activer ou désactiver les effets visuels
-int isRapideLaunch= 1; //Activer ou désactiver la lancement rapide du jeu
+int isRapideLaunch= 0; //Activer ou désactiver la lancement rapide du jeu
 const int enablePrintLogsInConsole = 0; //Certaine fonctions seront remplacée pour marcher dans l'editeur
 const int linesMax = GrildLenght; //Détermination de l'aire de jeu (X)
 const int colsMax = GrildLenght; //Détermination de l'aire de jeu (Y)

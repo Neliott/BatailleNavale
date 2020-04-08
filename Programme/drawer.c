@@ -1,6 +1,6 @@
 /*
  * Projet : Bataille Navale
- * Description : Une bataille navale en C dans le cadre MA-20 et ICT-114 du CPNV
+ * Description : Une bataille navale en C dans le cadre MA-20 et ICT-431 du CPNV
  * Auteur : Eliott Jaquier
  * Ce script sert à afficher des 'images' définie dans la console.
 */
