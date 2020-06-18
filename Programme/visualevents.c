@@ -9,7 +9,7 @@
  * @param event : L'id de l'évènement de partie
  */
 void visualEvent(int event){//Event : (0->Lancement, 1->plouf, 2->touché, 3->coulé, 4->Fin de partie)
-    time_t t = time(NULL); //https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program
+    time_t t = time(NULL);
     struct tm tm = *localtime(&t);//Prise de l'instance de l'heure locale dans une structure
     switch (event){
         case 0://Animation de lancement

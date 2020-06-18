@@ -1,0 +1,122 @@
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Lancement du jeu
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Création des dossiers requis au démarage
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage du menu
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage des paramètres
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage des paramètres
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage des paramètres
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage des paramètres
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage des paramètres
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage du menu
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Démarage d'une partie
+11.06.2020 à 14:41 - GAME EVENT : Attente du retour de la carte choisie...
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Démarage du choix de la carte
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Demande de la méthode de jeu à l'utilisateur
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Mise en place des tableaux
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage des cartes trouvées
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Prise d'une carte aléatoire
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Ouverture de la carte
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Le tableau des bateaux a été traîté avec succès
+11.06.2020 à 14:41 - GAME EVENT : Carte initialisée...
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Mise de la carte dans les tableaux de jeux
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Remise à zéro des tableaux terminée
+11.06.2020 à 14:41 - BOOT AND LOW-SYSTEMS : Fin de la manipulation des tableaux
+11.06.2020 à 14:41 - GAME EVENT : Carte opérationnelle
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:41 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:41 - GAME EVENT : Le joueur n'a rien touché
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:41 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:41 - GAME EVENT : Le joueur n'a rien touché
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:41 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:41 - GAME EVENT : Le joueur n'a rien touché
+11.06.2020 à 14:41 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:41 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a coulé un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur n'a rien touché
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:42 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:42 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a coulé un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a coulé un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur n'a rien touché
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a coulé un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a touché un bateau
+11.06.2020 à 14:43 - UI SYSTEM AND MANAGER : Affichage de la grille de jeu
+11.06.2020 à 14:43 - GAME EVENT : Le joueur entre une position...
+11.06.2020 à 14:43 - GAME EVENT : Le joueur a coulé le dernier bateau
+11.06.2020 à 14:44 - GAME EVENT : FIN DE PARTIE !
+11.06.2020 à 14:44 - GAME EVENT : Définition du score
+11.06.2020 à 14:44 - GAME EVENT : Demande d'un pseudo
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Enregistrement du score
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Le fichier n'est pas trouvé. Création...
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Score enregistré dans le fichier avec succès !
+11.06.2020 à 14:44 - UI SYSTEM AND MANAGER : Affichage des scores
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Mise en place du dossier
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Ouverture du fichier
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Fichier de scores trouvé
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Initialisation des tableaux
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Récupération des lignes
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Séparation des informations
+11.06.2020 à 14:44 - UI SYSTEM AND MANAGER : Affichage des scores au joueur
+11.06.2020 à 14:44 - UI SYSTEM AND MANAGER : Affichage du menu
+11.06.2020 à 14:44 - UI SYSTEM AND MANAGER : Affichage des scores
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Mise en place du dossier
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Ouverture du fichier
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Fichier de scores trouvé
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Initialisation des tableaux
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Récupération des lignes
+11.06.2020 à 14:44 - BOOT AND LOW-SYSTEMS : Séparation des informations
+11.06.2020 à 14:44 - UI SYSTEM AND MANAGER : Affichage des scores au joueur
+11.06.2020 à 14:45 - UI SYSTEM AND MANAGER : Affichage du menu
+11.06.2020 à 14:45 - BOOT AND LOW-SYSTEMS : Lancement du jeu
+11.06.2020 à 14:45 - BOOT AND LOW-SYSTEMS : Création des dossiers requis au démarage
+11.06.2020 à 14:45 - UI SYSTEM AND MANAGER : Affichage du menu
+11.06.2020 à 14:45 - BOOT AND LOW-SYSTEMS : Lancement du jeu
+11.06.2020 à 14:45 - BOOT AND LOW-SYSTEMS : Création des dossiers requis au démarage
+11.06.2020 à 14:45 - UI SYSTEM AND MANAGER : Affichage du menu
+11.06.2020 à 14:45 - BOOT AND LOW-SYSTEMS : Fin du jeu sans erreur

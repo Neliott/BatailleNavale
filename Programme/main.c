@@ -351,7 +351,7 @@ void setScore(){
     while((voider=getchar()) != EOF && voider != '\n'); //Li un caractère jusqu'à ce que le "scanf" ne lui envoye plus rien d'interresant
 
     /*Récupération de la date*/
-    time_t t = time(NULL); //https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program
+    time_t t = time(NULL);
     struct tm tm = *localtime(&t);//Prise de l'instance de l'heure locale dans une structure
 
     /*Récupération du score*/
@@ -470,7 +470,6 @@ void displayScores(){
         logAction(1,"Séparation des informations");
         for(int i = 0; i < nbLines; ++i)
         {
-            /*  https://www.educative.io/edpresso/splitting-a-string-using-strtok-in-c  */
             char * token = strtok(lines[i], ";"); //Division une première fois des différentes parties (dans un pointeur)
             int countWords = 0;
 
@@ -562,7 +561,7 @@ void getRandomGame(){
         /*Séléction du type de chargment de map*/
         if(choix > 0 && choix < 3){
             pathFile[128] = "./maps/";
-            DIR* rep = opendir("maps"); //https://waytolearnx.com/2019/09/lister-les-fichiers-dans-un-repertoire-en-c.html
+            DIR* rep = opendir("maps");
 
             if (rep != NULL)//Si le répertoire existe
             {
@@ -900,7 +899,7 @@ void logAction(int typeEvent,char * texte){
     char eventName[4][64] = {"FATAL ERROR","BOOT AND LOW-SYSTEMS","UI SYSTEM AND MANAGER","GAME EVENT"};//Les type d'évènements
 
     //Récupération de la date actuelle
-    time_t t = time(NULL); //https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program
+    time_t t = time(NULL);
     struct tm tm = *localtime(&t);//Prise de l'instance de l'heure locale dans une structure
 
     if(enablePrintLogsInConsole){
